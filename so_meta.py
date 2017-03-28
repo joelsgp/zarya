@@ -363,7 +363,7 @@ def rungame():
                 Room = PrevRoom
             else:
                 stutter('I\'m sorry ' + Player['Name'] + ', you can\'t do that.')
-        elif 'go through' in Do:
+        elif 'go through' in Do and 'port' in Do:
             SubStringEnd = Do.index('port')
             SubStringEnd = SubStringEnd - 1
             Direction = Do[11:SubStringEnd]
