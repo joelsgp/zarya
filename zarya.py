@@ -1,7 +1,6 @@
 from random import randint
 from time import sleep
 from urllib import request
-from tkinter import *
 
 #for recursion
 def rungame():
