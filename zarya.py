@@ -2,7 +2,7 @@
 def rungame():
     from random import randint
     from time import sleep
-    import urllib.request
+    from urllib import request
 
     #newline
     def n():
@@ -148,6 +148,7 @@ def rungame():
         while Laptop['State'] == 'On':
             n()
             Task = input()
+            log(Task)
             n()
             if 'turn off' in Task:
                 stutter('You turn off the laptop.')
@@ -155,11 +156,17 @@ def rungame():
             elif Task == 'browse web':
                 stutter('A browser window opens. Where do you want to go?')
                 URL = input()
-                with urllib.request.urlopen(URL) as response:
+                log(URL)
+                try:
+                    response = request.urlopen(URL)
                     html = response.read()
-                print(html)
-                stutter('Hmm, looks like there\'s no GUI.')
-                stutter('Oh well.')
+                    print(html)
+                    stutter('Hmm, looks like there\'s no GUI.')
+                    stutter('Oh well.')
+                except ValueError as err:
+                    stutter('That\'s not a valid URL.')
+                except urllib.error.URLError as err:
+                    stutter('You have no internet connection.')
             elif Task == 'read files':
                 if Laptop['Files'] == 'None':
                     stutter('You have no files to read!')
@@ -175,12 +182,14 @@ def rungame():
                 NotRight = True
                 while NotRight == True:
                     Contact = input()
+                    log(Contact)
                     if Contact in Contacts:
                         NotRight = False
                         if Contact == 'nasa social media team':
                             stutter('You can send pictures to NASA to be posted online.')
                             stutter('What picture would you like to send?')
                             Picture = input()
+                            log(Picture)
                             if 'picture' in Picture:
                                 if Picture in Inventory:
                                     stutter('You send the picture.')
@@ -206,6 +215,7 @@ def rungame():
                 stutter('There is a button that says \'fire main engines\'.')
                 stutter('Would you like to press it?')
                 Choice = input()
+                log(Choice)
                 if 'yes' in Choice:
                     stutter('You press the button and tons of Gs force you against the back of the module.')
                     stutter('This is a cargo module, which means there\'s no seat to help you.')
@@ -297,7 +307,7 @@ def rungame():
 
     #start game
     Room = Zarya
-    stutterf('Zarya v1.1')
+    stutterf('Zarya v3')
     stutterf('© Joel McBride 2017')
     stutterf('Remember to report any bugs or errors to \'jmcbri14@st-pauls.leicester.sch.uk.\'')
     n()
@@ -308,6 +318,7 @@ def rungame():
     while Carry['On'] == True:
         n()
         Do = str.lower(input())
+        log(Do)
         n()
         if Do == 'help':
             for i in range (len(Commands)):
@@ -440,5 +451,20 @@ def rungame():
         else:
             stutter('That\'s not a valid command.')
 
-rungame()
-quit()
+#logging
+def log(Text):
+    LogFile = open('log.txt', 'a+')
+    LogFile.write('\n' + str(Text))
+    LogFile.close()
+#test
+log('\n')
+log('hello world!')
+
+try:
+    rungame()
+    quit()
+except:
+    import sys
+    err = sys.exc_info()
+    log(err)
+    print('ERROR')
