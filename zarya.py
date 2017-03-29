@@ -1,9 +1,10 @@
+from random import randint
+from time import sleep
+from urllib import request
+from tkinter import *
+
 #for recursion
 def rungame():
-    from random import randint
-    from time import sleep
-    from urllib import request
-
     #newline
     def n():
         print('')
@@ -77,6 +78,8 @@ def rungame():
     Functions.append('-Removes an item from your inventory')
     Commands.append('quit')
     Functions.append('-Ends the game')
+    Commands.append('Note:')
+    Functions.append('You can also use abbrevitations for some commands.')
     Commands.append('WARNING:')
     Functions.append('Parsing is not yet implemented, so enter commands as they appear here.')
 
@@ -225,6 +228,7 @@ def rungame():
                             'when its unsheilded mass burntup violently in the atmosphere.')
                     stutters('GAME OVER')
                     Carry['On'] = False
+                    Delay = input()
                     break
                 else:
                     stutter('That was probably a sensible choice.')
@@ -305,6 +309,16 @@ def rungame():
     Player = {'Name': 'Player', 'Wearing': 'Jumpsuit',
               'Inventory': Inventory, 'Images': 0}
 
+    def helpwindow():
+        helpw = Tk()
+        helpw.title('help')
+        helpc = Canvas(helpw, height = (len(Commands)*20)+20, width = 650)
+        helpc.pack()
+        Text = list()
+        for i in range (len(Commands)):
+            Text.append(helpc.create_text(325, (i*20)+20, text=Commands[i] + ' ' + Functions[i]))
+
+
     #start game
     Room = Zarya
     stutterf('Zarya v3')
@@ -320,16 +334,16 @@ def rungame():
         Do = str.lower(input())
         log(Do)
         n()
-        if Do == 'help':
+        if Do == 'help' or Do == 'h':
             for i in range (len(Commands)):
                 stutterf(Commands[i])
                 stutterf(Functions[i])
             stutter('For the uninitiated: ')
             stutter('In text-based adventure games, a good first command when ' \
                     'starting out or \nentering a new place is \'look around\'.')
-        elif Do == 'quit':
+        elif Do == 'quit' or Do == 'q':
             break
-        elif Do == 'look around':
+        elif Do == 'look around' or Do == 'la':
             stutter('You are ' + Room['Desc'] + ' ')
             Items = Room['Items']
             if len(Items) > 0:
@@ -344,7 +358,7 @@ def rungame():
                 PortStates = list(Ports.values())
                 for i in range (len(Room['Ports'])):
                     stutter('One to ' + PortTypes[i] + ' that is ' + PortStates[i] + '.')
-        elif Do == 'show inventory':
+        elif Do == 'show inventory' or Do == 'si':
             if len(Inventory) == 0:
                 stutter('Your inventory is empty.')
             else:
@@ -389,7 +403,7 @@ def rungame():
                     stutter('That port is closed.')
             else:
                 stutter('The module you\'re in doesn\'t have a port there.')
-        elif Do == 'take all':
+        elif Do == 'take all' or Do == 'ta':
             ItemsList = list(Room['Items'])
             if len(ItemsList) > 0:
                 stutter('You: ')
@@ -442,10 +456,10 @@ def rungame():
                 del Inventory[Item]
             else:
                 stutter('That item isn\'t in your inventory.')
-        elif Do == 'skip':
+        elif Do == 'skip' or Do == 's':
             Skip = True
             stutter('Text will now output instantly.')
-        elif Do == 'play':
+        elif Do == 'play' or Do == 'p':
             Skip = False
             stutter('Text will now output gradually.')
         else:
