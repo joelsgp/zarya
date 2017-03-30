@@ -49,7 +49,7 @@ def rungame():
 
     Inventory = dict()
 
-    #list of Help for help
+    #list of commands for help
     Help = list()
     Functions = list()
     Help.append('help -Shows a list of commands')
@@ -129,7 +129,7 @@ def rungame():
             stutterf('browse web')
             stutterf('use messenger app')
             stutterf('read files')
-            stutterf('noskip text game')
+            stutterf('play text game')
             stutterf('control station module')
             Laptop['Tutorial'] = 'Complete'
             n()
@@ -192,7 +192,7 @@ def rungame():
                                 stutter('That\'s not a picture!')
                     else:
                         stutter('They aren\'t in your contacts list.')
-            elif Task == 'noskip text game':
+            elif Task == 'play text game':
                 rungame()
             elif Task == 'control station module':
                 stutter('A window opens with a few readouts and options.')
@@ -303,7 +303,7 @@ def rungame():
         helpc.pack()
         Text = list()
         for i in range (len(Help)):
-            Text.append(helpc.create_text(325, (i*20)+20, text=Help[i] + ' ' + Functions[i]))
+            Text.append(helpc.create_text(325, (i*20)+20, text=Help[i])
 
 
     #start game
@@ -313,7 +313,7 @@ def rungame():
     stutterf('Remember to report any bugs or errors to \'jmcbri14@st-pauls.leicester.sch.uk.\'')
     n()
     stutter('Date: September 12th, 2000')
-    stutter('For a list of Help, type \'help\'.')
+    stutter('For a list of commands, type \'help\'.')
     #command reader
     Carry = {'On': True}
     while Carry['On'] == True:
@@ -454,7 +454,7 @@ def rungame():
         elif Do == 'skip' or Do == 's':
             Skip = True
             stutter('Text will now output instantly.')
-        elif Do == 'noskip' or Do == 'p':
+        elif Do == 'noskip' or Do == 'n' or Do == 'ns':
             Skip = False
             stutter('Text will now output gradually.')
         else:
