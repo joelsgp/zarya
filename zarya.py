@@ -67,8 +67,6 @@ def rungame():
     Help.append('quit -Ends the game')
     Help.append('Note:')
     Help.append('You can also use abbrevitations for some commands.')
-    Help.append('WARNING:')
-    Help.append('Parsing is not yet implemented, so enter Help as they appear here.')
 
     #item use subroutines
     def usepaper():
@@ -122,6 +120,9 @@ def rungame():
 
     def usebed():
         stutter('You sleep till \'morning\'.')
+        nonlocal FicEpoch
+        FicEpoch += 86400
+        stutter('Date: ' + datetime.fromtimestamp(FicEpoch).strftime('%d.%m.%Y'))
 
     def uselaptop():
         if Laptop['Tutorial'] == 'Pending':
@@ -305,14 +306,16 @@ def rungame():
         for i in range (len(Help)):
             Text.append(helpc.create_text(325, (i*20)+20, text=Help[i]))
 
+    Months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
 
     #start game
     Room = Zarya
+    FicEpoch = 968716800
     stutterf('Zarya v4')
     stutterf('© Joel McBride 2017')
     stutterf('Remember to report any bugs or errors to \'jmcbri14@st-pauls.leicester.sch.uk.\'')
     n()
-    stutter('Date: September 12th, 2000')
+    stutter('Date: ' + datetime.fromtimestamp(FicEpoch).strftime('%d.%m.%Y'))
     stutter('For a list of commands, type \'help\'.')
     #command reader
     Carry = {'On': True}
@@ -479,4 +482,5 @@ except:
     if not 'SystemExit' in str(err):
         log(err)
         print('ERROR')
+        print(err)
         Delay = input()
