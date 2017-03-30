@@ -476,6 +476,7 @@ try:
 except:
     import sys
     err = sys.exc_info()
-    log(err)
-    print('ERROR')
-    Delay = input()
+    if not 'SystemExit' in str(err):
+        log(err)
+        print('ERROR')
+        Delay = input()
