@@ -49,39 +49,26 @@ def rungame():
 
     Inventory = dict()
 
-    #list of commands for help
-    Commands = list()
+    #list of Help for help
+    Help = list()
     Functions = list()
-    Commands.append('help')
-    Functions.append('-Shows a list of commands')
-    Commands.append('skip')
-    Functions.append('-Toggles stuttering off')
-    Commands.append('play')
-    Functions.append('-Toggles stuttering on')
-    Commands.append('look around')
-    Functions.append('-Tells you what is in the room')
-    Commands.append('show inventory')
-    Functions.append('-Tells you what is in your inventory')
-    Commands.append('search [object]')
-    Functions.append('-Tells you what is in a container')
-    Commands.append('take [item]')
-    Functions.append('-Puts an item in your inventory')
-    Commands.append('take all')
-    Functions.append('-Puts all available items in your inventory')
-    Commands.append('use [item]')
-    Functions.append('-Lets you excersise the funtionality of an item')
-    Commands.append('leave [place]')
-    Functions.append('-Lets you leave where you are')
-    Commands.append('go through [direction] port')
-    Functions.append('-Travel into adjacent modules')
-    Commands.append('drop [item]')
-    Functions.append('-Removes an item from your inventory')
-    Commands.append('quit')
-    Functions.append('-Ends the game')
-    Commands.append('Note:')
-    Functions.append('You can also use abbrevitations for some commands.')
-    Commands.append('WARNING:')
-    Functions.append('Parsing is not yet implemented, so enter commands as they appear here.')
+    Help.append('help -Shows a list of commands')
+    Help.append('skip -Toggles stuttering off')
+    Help.append('noskip -Toggles stuttering on')
+    Help.append('look around -Tells you what is in the room')
+    Help.append('show inventory -Tells you what is in your inventory')
+    Help.append('search [object] -Tells you what is in a container')
+    Help.append('take [item] -Puts an item in your inventory')
+    Help.append('take all -Puts all available items in your inventory')
+    Help.append('use [item] -Lets you excersise the funtionality of an item')
+    Help.append('leave [place] -Lets you leave where you are')
+    Help.append('go through [direction] port -Travel into adjacent modules')
+    Help.append('drop [item] -Removes an item from your inventory')
+    Help.append('quit -Ends the game')
+    Help.append('Note:')
+    Help.append('You can also use abbrevitations for some commands.')
+    Help.append('WARNING:')
+    Help.append('Parsing is not yet implemented, so enter Help as they appear here.')
 
     #item use subroutines
     def usepaper():
@@ -142,7 +129,7 @@ def rungame():
             stutterf('browse web')
             stutterf('use messenger app')
             stutterf('read files')
-            stutterf('play text game')
+            stutterf('noskip text game')
             stutterf('control station module')
             Laptop['Tutorial'] = 'Complete'
             n()
@@ -205,7 +192,7 @@ def rungame():
                                 stutter('That\'s not a picture!')
                     else:
                         stutter('They aren\'t in your contacts list.')
-            elif Task == 'play text game':
+            elif Task == 'noskip text game':
                 rungame()
             elif Task == 'control station module':
                 stutter('A window opens with a few readouts and options.')
@@ -312,21 +299,21 @@ def rungame():
     def helpwindow():
         helpw = Tk()
         helpw.title('help')
-        helpc = Canvas(helpw, height = (len(Commands)*20)+20, width = 650)
+        helpc = Canvas(helpw, height = (len(Help)*20)+20, width = 650)
         helpc.pack()
         Text = list()
-        for i in range (len(Commands)):
-            Text.append(helpc.create_text(325, (i*20)+20, text=Commands[i] + ' ' + Functions[i]))
+        for i in range (len(Help)):
+            Text.append(helpc.create_text(325, (i*20)+20, text=Help[i] + ' ' + Functions[i]))
 
 
     #start game
     Room = Zarya
-    stutterf('Zarya v3')
+    stutterf('Zarya v4')
     stutterf('© Joel McBride 2017')
     stutterf('Remember to report any bugs or errors to \'jmcbri14@st-pauls.leicester.sch.uk.\'')
     n()
     stutter('Date: September 12th, 2000')
-    stutter('For a list of commands, type \'help\'.')
+    stutter('For a list of Help, type \'help\'.')
     #command reader
     Carry = {'On': True}
     while Carry['On'] == True:
@@ -335,15 +322,14 @@ def rungame():
         log(Do)
         n()
         if Do == 'help' or Do == 'h':
-            for i in range (len(Commands)):
-                stutterf(Commands[i])
-                stutterf(Functions[i])
+            for i in range (len(Help)):
+                stutterf(Help[i])
             stutter('For the uninitiated: ')
             stutter('In text-based adventure games, a good first command when ' \
                     'starting out or \nentering a new place is \'look around\'.')
         elif Do == 'quit' or Do == 'q':
             break
-        elif Do == 'look around' or Do == 'la':
+        elif Do == 'look around' or Do == 'look' or Do == 'la' or Do == 'l':
             stutter('You are ' + Room['Desc'] + ' ')
             Items = Room['Items']
             if len(Items) > 0:
@@ -358,7 +344,7 @@ def rungame():
                 PortStates = list(Ports.values())
                 for i in range (len(Room['Ports'])):
                     stutter('One to ' + PortTypes[i] + ' that is ' + PortStates[i] + '.')
-        elif Do == 'show inventory' or Do == 'si':
+        elif Do == 'show inventory' or Do == 'inventory' or Do == 'si' or Do == 'i':
             if len(Inventory) == 0:
                 stutter('Your inventory is empty.')
             else:
@@ -388,10 +374,19 @@ def rungame():
                 Room = PrevRoom
             else:
                 stutter('I\'m sorry ' + Player['Name'] + ', you can\'t do that.')
-        elif 'go through' in Do and 'port' in Do:
-            SubStringEnd = Do.index('port')
-            SubStringEnd = SubStringEnd - 1
-            Direction = Do[11:SubStringEnd]
+        elif 'go through' in Do or 'gt' in Do:
+            if 'go through' in Do and 'port' in Do:
+                SubStringEnd = Do.index('port')
+                SubStringEnd = SubStringEnd - 1
+                Direction = Do[11:SubStringEnd]
+            elif 'go through' in Do:
+                Direction = Do[11:]
+            elif 'gt' in Do and 'p' in Do:
+                SubStringEnd = Do.index('p')
+                SubStringEnd = SubStringEnd - 1
+                Direction = Do[3:SubStringEnd]
+            elif 'gt' in Do:
+                Direction = Do[3:]
             if Direction in Room['Ports']:
                 Ports = Room['Ports']
                 if Ports[Direction] == 'open':
@@ -459,7 +454,7 @@ def rungame():
         elif Do == 'skip' or Do == 's':
             Skip = True
             stutter('Text will now output instantly.')
-        elif Do == 'play' or Do == 'p':
+        elif Do == 'noskip' or Do == 'p':
             Skip = False
             stutter('Text will now output gradually.')
         else:
