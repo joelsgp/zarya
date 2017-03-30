@@ -1,6 +1,7 @@
 from random import randint
 from time import sleep
 from urllib import request
+from datetime import datetime
 
 #for recursion
 def rungame():
@@ -469,9 +470,10 @@ def log(Text):
     LogFile = open('log.txt', 'a+')
     LogFile.write('\n' + str(Text))
     LogFile.close()
-#test
+#log newgame
 log('\n')
 log('hello world!')
+log(str(datetime.now()))
 
 try:
     rungame()
