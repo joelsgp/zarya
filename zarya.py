@@ -303,7 +303,7 @@ def rungame():
         helpc.pack()
         Text = list()
         for i in range (len(Help)):
-            Text.append(helpc.create_text(325, (i*20)+20, text=Help[i])
+            Text.append(helpc.create_text(325, (i*20)+20, text=Help[i]))
 
 
     #start game
@@ -478,3 +478,4 @@ except:
     err = sys.exc_info()
     log(err)
     print('ERROR')
+    Delay = input()
