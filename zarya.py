@@ -297,18 +297,34 @@ def rungame():
     Player = {'Name': 'Player', 'Wearing': 'Jumpsuit',
               'Inventory': Inventory, 'Images': 0}
 
-    def helpwindow():
-        helpw = Tk()
-        helpw.title('help')
-        helpc = Canvas(helpw, height = (len(Help)*20)+20, width = 650)
-        helpc.pack()
-        Text = list()
-        for i in range (len(Help)):
-            Text.append(helpc.create_text(325, (i*20)+20, text=Help[i]))
+##    def helpwindow():
+##        helpw = Tk()
+##        helpw.title('help')
+##        helpc = Canvas(helpw, height = (len(Help)*20)+20, width = 650)
+##        helpc.pack()
+##        Text = list()
+##        for i in range (len(Help)):
+##            Text.append(helpc.create_text(325, (i*20)+20, text=Help[i]))
+
+    def autocommand():
+        LogFile = open('log.txt', 'r')
+        Log = LogFile.read()
+        Instances = Log.count('hello world!') - 1
+        Instance = []
+        for i in range(Instances):
+            NewLog = Log[Log.index('hello world!') + 13:]
+            ThisInstance = NewLog[:NewLog.index('hello world!')]
+            InstanceLines = ThisInstance.count('\n')
+            Instance.append(list())
+            for i in range(InstanceLines):
+                Instance[i].append
+            print(Instance[i])
+            Log = NewLog
 
     Months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
 
     #start game
+    autocommand()
     Room = Zarya
     FicEpoch = 968716800
     stutterf('Zarya v4')
@@ -469,7 +485,6 @@ def log(Text):
     LogFile.write('\n' + str(Text))
     LogFile.close()
 #log newgame
-log('\n')
 log('hello world!')
 log(str(datetime.now()))
 
