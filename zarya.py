@@ -68,6 +68,11 @@ def rungame():
     Help.append('Note:')
     Help.append('You can also use abbrevitations for some commands.')
 
+    #npc interact subroutines
+    def talktocrewmate():
+        stutter('Hello there! Glad to see you got that malfunctioning hatch '\
+                'open.')
+    
     #item use subroutines
     def usepaper():
         stutter('The strip of paper has a password on it.')
@@ -119,10 +124,15 @@ def rungame():
                 'how this \nhappens if you meet one, they\'re tired of the question.')
 
     def usebed():
-        stutter('You sleep till \'morning\'.')
-        nonlocal FicEpoch
-        FicEpoch += 86400
-        stutter('Date: ' + datetime.fromtimestamp(FicEpoch).strftime('%d.%m.%Y'))
+        stutter('You get in the \'bed\'.')
+        if Player['Sleep'] > 8:
+            stutter('You sleep until you are no longer tired.')
+            nonlocal FicEpoch
+            FicEpoch += Player['Sleep'] * 3600
+            Player['Sleep'] = 0
+            stutter('Date: ' + datetime.fromtimestamp(FicEpoch).strftime('%d.%m.%Y'))
+        else:
+            stutter('You are not tired enough to get to sleep.')
 
     def uselaptop():
         if Laptop['Tutorial'] == 'Pending':
@@ -244,7 +254,7 @@ def rungame():
               'on the wall.',
               'Usable': 'Yes', 'Takeable': 'Yes'}
     Toilet = {'Name': 'Space Toilet', 'Desc': ' a bogstandard space toilet ' \
-              'in a little cubicle.',
+              'in a little cubicle. Pun intended.',
               'Usable': 'Yes'}
     Bed = {'Name': 'Sleeping Bag', 'Desc': ' a simple sleeping bag strapped ' \
               'securely to a wall.',
@@ -295,7 +305,7 @@ def rungame():
 
     #player
     Player = {'Name': 'Player', 'Wearing': 'Jumpsuit',
-              'Inventory': Inventory, 'Images': 0}
+              'Inventory': Inventory, 'Images': 0, 'Sleep': 5}
 
     def helpwindow():
         helpw = Tk()
@@ -311,7 +321,7 @@ def rungame():
     #start game
     Room = Zarya
     FicEpoch = 968716800
-    stutterf('Zarya v4')
+    stutterf('Zarya v4.05')
     stutterf('© Joel McBride 2017')
     stutterf('Remember to report any bugs or errors to \'jmcbri14@st-pauls.leicester.sch.uk.\'')
     n()
@@ -320,6 +330,8 @@ def rungame():
     #command reader
     Carry = {'On': True}
     while Carry['On'] == True:
+        Player['Sleep'] += 1
+        FicEpoch += 3600
         n()
         Do = str.lower(input())
         log(Do)
@@ -377,7 +389,7 @@ def rungame():
                 Room = PrevRoom
             else:
                 stutter('I\'m sorry ' + Player['Name'] + ', you can\'t do that.')
-        elif 'go through' in Do or 'gt' in Do:
+        elif 'go through' in Do or 'gt' in Do or 'go' in Do:
             if 'go through' in Do and 'port' in Do:
                 SubStringEnd = Do.index('port')
                 SubStringEnd = SubStringEnd - 1
@@ -388,7 +400,7 @@ def rungame():
                 SubStringEnd = Do.index('p')
                 SubStringEnd = SubStringEnd - 1
                 Direction = Do[3:SubStringEnd]
-            elif 'gt' in Do:
+            elif 'gt' in Do or 'go' in Do:
                 Direction = Do[3:]
             if Direction in Room['Ports']:
                 Ports = Room['Ports']
@@ -473,6 +485,7 @@ log('\n')
 log('hello world!')
 log(str(datetime.now()))
 
+#run
 try:
     rungame()
     quit()
