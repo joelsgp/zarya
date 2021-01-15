@@ -5,6 +5,8 @@ import json
 import discord
 import discord.ext.commands
 
+import zarya_discord
+
 
 with open('settings.json', 'r') as settings_json:
     settings = json.load(settings_json)
@@ -82,4 +84,6 @@ async def logs(ctx):
 
 
 if __name__ == '__main__':
-    client.run()
+    # client.run()
+    zarya_discord.log_start()
+    zarya_discord.run_game()
