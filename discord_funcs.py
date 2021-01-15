@@ -28,12 +28,19 @@ async def discord_stutter(text, channel, delay=lambda: random.randint(1, 3)/100,
         delay -- a function that returns the time in seconds to wait between each character
         skip -- if True, message will be sent all at once instead of with the gradual effect
     """
+    if not text:
+        return
+
     if skip:
         await channel.send(text)
     else:
-        message = await channel.send(text[0])
-        for i in range(2, len(text)):
-            await message.edit(content=text[:i])
+        # part_len = len(text) // 5
+        part_len = 100
+        parts = [text[i:i+part_len] for i in range(0, len(text), part_len)]
+
+        message = await channel.send(parts[0])
+        for i in range(2, len(parts)):
+            await message.edit(content=''.join(parts[:i]))
             time.sleep(delay())
 
 
