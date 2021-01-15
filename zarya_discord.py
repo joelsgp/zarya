@@ -387,6 +387,10 @@ async def run_game(client, send_channel, req_channel_name):
                           'Anyway, I had the idea recently (2021) to make a text based adventure game for Discord, '
                           'so I went back to my old project, touched the code up a bit, ported it, and here we are.')
 
+        # ignore bot-level commands
+        elif Do in ['logs', 'log', 'log.txt']:
+            pass
+
         elif Do in ['quit', 'q']:
             break
 
