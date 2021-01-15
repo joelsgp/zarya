@@ -4,7 +4,7 @@ import urllib.request
 import urllib.error
 
 from datetime import datetime
-from tkinter import *
+# from tkinter import *
 
 
 __version__ = '4.0.5'
@@ -158,9 +158,9 @@ def run_game():
                     print(html)
                     stutter("Hmm, looks like there's no GUI.")
                     stutter('Oh well.')
-                except ValueError as err:
-                    stutter('That\'s not a valid URL.')
-                except urllib.error.URLError as err:
+                except ValueError:
+                    stutter("That's not a valid URL.")
+                except urllib.error.URLError:
                     stutter('You have no internet connection.')
             elif task == 'read files':
                 if Laptop['Files'] == 'None':
@@ -309,14 +309,14 @@ def run_game():
     Player = {'Name': 'Player', 'Wearing': 'Jumpsuit',
               'Inventory': inventory, 'Images': 0, 'Sleep': 5}
 
-    def helpwindow():
-        helpw = Tk()
-        helpw.title('help')
-        helpc = Canvas(helpw, height=(len(help_info)*20)+20, width=650)
-        helpc.pack()
-        text = list()
-        for help_info_item in help_info:
-            text.append(helpc.create_text(325, (i*20)+20, text=help_info_item))
+    # def helpwindow():
+    #     helpw = Tk()
+    #     helpw.title('help')
+    #     helpc = Canvas(helpw, height=(len(help_info)*20)+20, width=650)
+    #     helpc.pack()
+    #     text = list()
+    #     for help_info_item in help_info:
+    #         text.append(helpc.create_text(325, (i*20)+20, text=help_info_item))
 
     Months = [
         'January', 'February', 'March', 'April', 'May', 'June',
@@ -341,15 +341,15 @@ def run_game():
         Do = str.lower(input())
         log(Do)
         n()
-        if Do == 'help' or Do == 'h':
+        if Do in ['help', 'h']:
             for help_info_item in help_info:
                 stutterf(help_info_item)
             stutter('For the uninitiated: ')
-            stutter('In text-based adventure games, a good first command when ' \
-                    'starting out or \nentering a new place is \'look around\'.')
+            stutter('In text-based adventure games, a good first command when '
+                    "starting out or \nentering a new place is 'look around'.")
         elif Do == 'quit' or Do == 'q':
             break
-        elif Do == 'look around' or Do == 'look' or Do == 'la' or Do == 'l':
+        elif Do in ['look around', 'look', 'la', 'l']:
             stutter('You are ' + Room['Desc'] + ' ')
             Items = Room['Items']
             if len(Items) > 0:
@@ -361,10 +361,10 @@ def run_game():
                 Ports = Room['Ports']
                 PortTypes = list(Ports.keys())
                 PortStates = list(Ports.values())
-                for i in range (len(Room['Ports'])):
-                    stutter('One to ' + PortTypes[i] + ' that is ' + PortStates[i] + '.')
-        elif Do == 'show inventory' or Do == 'inventory' or Do == 'si' or Do == 'i':
-            if len(inventory) == 0:
+                for i, value in enumerate(Room['Ports']):
+                    stutter(f'One to {PortTypes[i]} that is {PortStates[i]}.')
+        elif Do in ['show inventory', 'inventory', 'si', 'i']:
+            if not inventory:
                 stutter('Your inventory is empty.')
             else:
                 you_have = list(inventory)
@@ -375,18 +375,18 @@ def run_game():
             Object = Do[7:]
             if Object in Room['Objects']:
                 PrevRoom = Room
-                stutter('You search the ' + Object + '.')
+                stutter(f'You search the {Object}.')
                 ObjectIndx = Room['Objects']
                 Room = ObjectIndx[Object]
                 Items = list(Room['Items'])
                 if len(Items) > 0:
-                    stutter('The ' + Object + ' contain(s):')
-                    for i in range (len(Items)):
-                        stutter(Items[i])
+                    stutter(f'The {Object} contain(s):')
+                    for item in Items:
+                        stutter(item)
                 else:
-                    stutter('There isn\'t anything here.')
+                    stutter("There isn't anything here.")
             else:
-                stutter('That isn\'t in here.')
+                stutter("That isn't in here.")
         elif 'leave' in Do:
             if Room['Leavable'] == 1:
                 stutter('You leave the ' + str.lower(Room['Name']) + '.')
@@ -416,15 +416,15 @@ def run_game():
                 else:
                     stutter('That port is closed.')
             else:
-                stutter('The module you\'re in doesn\'t have a port there.')
-        elif Do == 'take all' or Do == 'ta':
+                stutter("The module you're in doesn't have a port there.")
+        elif Do in ['take all', 'ta']:
             ItemsList = list(Room['Items'])
             if len(ItemsList) > 0:
                 stutter('You: ')
                 stutter('TAKE ')
                 stutter('ALL THE THINGS.')
                 Items = Room['Items']
-                for i in range (len(Items)):
+                for i, value in enumerate(Items):
                     Item = ItemsList[i]
                     TrueItem = str.upper(Item[0]) + Item[1:]
                     if 'Takeable' in eval(TrueItem):
@@ -432,9 +432,9 @@ def run_game():
                         inventory[Item] = Details
                         del Items[Item]
                     else:
-                        stutter('You can\'t take the ' + Item + '.')
+                        stutter(f"You can't take the {Item}.")
             else:
-                stutter('There\'s nothing here.')
+                stutter("There's nothing here.")
         elif 'take' in Do:
             Item = Do[5:]
             Items = Room['Items']
