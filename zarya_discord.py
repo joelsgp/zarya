@@ -1,4 +1,3 @@
-import time
 import random
 import urllib.request
 import urllib.error
@@ -203,7 +202,7 @@ async def run_game(client, send_channel, req_channel_name):
                         await stutter("They aren't in your contacts list.")
 
             elif task in 'play text game':
-                await run_game()
+                await run_game(client, send_channel, req_channel_name)
 
             elif task in 'control station module':
                 await stutter('A window opens with a few readouts and options.')
