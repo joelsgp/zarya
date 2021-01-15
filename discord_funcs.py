@@ -32,12 +32,12 @@ async def discord_stutter(text, channel, delay=lambda: random.randint(1, 3)/100,
         await channel.send(text)
     else:
         message = await channel.send(text[0])
-        for i in range(1, len(text)):
+        for i in range(2, len(text)):
             await message.edit(text[:i])
             time.sleep(delay())
 
 
-def input_from_message(message, channel, prefixes=None):
+def input_from_message(message, req_channel_name, prefixes=None):
     """Get input from a discord message.
 
     Args:
@@ -51,7 +51,7 @@ def input_from_message(message, channel, prefixes=None):
     if not prefixes:
         prefixes = ['>', '9v']
 
-    if not channel or message.channel.name == channel:
+    if not req_channel_name or message.channel.name == req_channel_name:
         for prefix in prefixes:
             if message.content.startswith(prefix):
                 return message.content.removeprefix(prefix).strip()
@@ -59,7 +59,7 @@ def input_from_message(message, channel, prefixes=None):
     return ''
 
 
-async def discord_input(client, channel, prefixes=None):
+async def discord_input(discord_client, req_channel_name, prefixes=None):
     """Wait for a discord message with valid input, then return it.
 
     Like the builtin input() function but for discord
@@ -71,8 +71,8 @@ async def discord_input(client, channel, prefixes=None):
         String content from a valid message, with the prefix removed.
     """
     while True:
-        new_message = await client.wait_for('message')
-        check = input_from_message(new_message, channel, prefixes)
+        new_message = await discord_client.wait_for('message')
+        check = input_from_message(new_message, req_channel_name, prefixes)
         if check:
             return check
 

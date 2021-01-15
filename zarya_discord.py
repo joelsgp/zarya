@@ -9,7 +9,7 @@ from datetime import datetime
 from discord_funcs import discord_input, discord_stutter
 
 
-__version__ = '5.x.x'
+__version__ = '0.1.0'
 
 
 # for recursion
@@ -328,7 +328,7 @@ async def run_game(client, channel):
     # start game
     Room = Zarya
     FicEpoch = 968716800
-    await stutterf(f'Zarya v{__version__}')
+    await stutterf(f'Zarya-Discord v{__version__}')
     await stutterf('© Joel McBride 2017, 2021')
     await stutterf("Remember to report any bugs or errors to 'joel.mcbride1@live.com'.")
     await n()
