@@ -141,7 +141,7 @@ async def run_game(client, send_channel, req_channel_name):
             log(task)
             await n()
 
-            if 'turn off' in task:
+            if task in 'turn off laptop':
                 await stutter('You turn off the laptop.')
                 Laptop['State'] = 'Off'
 
