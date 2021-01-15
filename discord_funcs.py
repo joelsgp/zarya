@@ -1,7 +1,13 @@
 import time
 import random
+import json
 
 import discord
+import discord.ext.commands
+
+
+with open('settings.json', 'r') as settings_json:
+    settings = json.load(settings_json)
 
 
 async def discord_stutter(text, channel, delay=lambda: random.randint(1, 3)/100, skip=False):
@@ -36,7 +42,7 @@ def input_from_message(message, channel, prefixes=None):
     if not prefixes:
         prefixes = ['>', '9v']
 
-    if not channel or message.channel == channel:
+    if not channel or message.channel.name == channel:
         for prefix in prefixes:
             if message.content.startswith(prefix):
                 return message.content.removeprefix(prefix).strip()
@@ -62,6 +68,18 @@ async def discord_input(client, channel, prefixes=None):
             return check
 
 
-def send_logs(channel, path='log.txt'):
+async def send_logs(channel, path='log.txt'):
     """Send logs to a discord channel."""
-    channel.send(discord.File(path))
+    await channel.send(discord.File(path))
+
+
+client = discord.ext.commands.bot.Bot(command_prefix=('>', '9v'))
+
+
+@client.command()
+async def logs(ctx):
+    await send_logs(ctx.channel)
+
+
+if __name__ == '__main__':
+    client.run()
