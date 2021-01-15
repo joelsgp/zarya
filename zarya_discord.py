@@ -240,36 +240,43 @@ async def run_game(client, send_channel, req_channel_name):
 
     Paper = {
         'Name': 'Paper', 'Desc': ' a strip of paper.',
-        'Usable': 'Yes', 'Takeable': 'Yes'
+        'Usable': 'Yes', 'Takeable': 'Yes',
+        'usefunc': usepaper,
     }
     Drive = {
         'Name': 'Drive', 'Desc': ' a usb stick.',
         'Usable': 'Yes', 'Takeable': 'Yes',
-        'Files': "'print('hello world!')'"
+        'Files': "'print('hello world!')'",
+        'usefunc': usedrive,
     }
     Jumpsuit = {
         'Name': 'Jumpsuit',
         'Desc': ' a blue jumpsuit with the flag of THE GLORIOUS SOVIET UNION I mean, Russia, on it.',
-        'Usable': 'Yes', 'Takeable': 'Yes'
+        'Usable': 'Yes', 'Takeable': 'Yes',
+        'usefunc': usejumpsuit,
     }
 
     Greenhouse = {
         'Name': 'Lada',
         'Desc': ' a little greenhouse thing with sprouts growing in it.',
-        'Usable': 'Yes'
+        'Usable': 'Yes',
+        'usefunc': usegreenhouse,
     }
     Camera = {
         'Name': 'Camera', 'Desc': ' a DSLR camera and a few lenses on the wall.',
-        'Usable': 'Yes', 'Takeable': 'Yes'
+        'Usable': 'Yes', 'Takeable': 'Yes',
+        'usefunc': usecamera,
     }
     Toilet = {
         'Name': 'Space Toilet', 'Desc': ' a bogstandard space toilet in a little cubicle. Pun intended.',
-        'Usable': 'Yes'
+        'Usable': 'Yes',
+        'usefunc': usetoilet,
     }
     Bed = {
         'Name': 'Sleeping Bag',
         'Desc': ' a simple sleeping bag strapped securely to a wall.',
-        'Usable': 'Yes'
+        'Usable': 'Yes',
+        'usefunc': usebed,
     }
 
     # objects
@@ -493,10 +500,9 @@ async def run_game(client, send_channel, req_channel_name):
         elif 'use' in Do:
             Item = Do[4:]
             if Item in inventory or Item in Room['Items']:
-                TrueItem = str.upper(Item[0]) + Item[1:]
+                TrueItem = Item.title()
                 if 'Usable' in eval(TrueItem):
-                    SubCall = f'await use{str(Item)}()'
-                    eval(SubCall)
+                    await eval(TrueItem)['usefunc']()
                 else:
                     await stutter("That item isn't usable.")
             else:
