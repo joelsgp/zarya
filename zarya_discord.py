@@ -126,11 +126,11 @@ async def run_game(client, send_channel, req_channel_name):
     async def uselaptop():
         if Laptop['Tutorial'] == 'Pending':
             await stutter('There is a sticker on the laptop that lists things you can do with it.')
-            stutterf('browse web')
-            stutterf('use messenger app')
-            stutterf('read files')
-            stutterf('play text game')
-            stutterf('control station module')
+            await stutterf('browse web')
+            await stutterf('use messenger app')
+            await stutterf('read files')
+            await stutterf('play text game')
+            await stutterf('control station module')
             Laptop['Tutorial'] = 'Complete'
             n()
         await stutter('You turn on the laptop.')
