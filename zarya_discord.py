@@ -36,9 +36,6 @@ async def run_game(client, send_channel, req_channel_name):
         await stutter(text)
         skip = skip_cached
 
-    # test
-    await stutter('a'*302)
-
     inventory = dict()
 
     # list of commands for help
