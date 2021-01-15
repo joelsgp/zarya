@@ -92,7 +92,7 @@ async def logs(ctx):
 
 @client.command()
 async def play(ctx):
-    await zarya_discord.log_start()
+    zarya_discord.log_start()
     await zarya_discord.run_game(client, ctx.channel)
 
 
