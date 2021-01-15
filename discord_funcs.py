@@ -90,7 +90,11 @@ async def logs(ctx):
     await send_logs(ctx.channel)
 
 
-if __name__ == '__main__':
-    # client.run()
+@client.command()
+async def play(ctx):
     zarya_discord.log_start()
-    zarya_discord.run_game()
+    zarya_discord.run_game(ctx.channel)
+
+
+if __name__ == '__main__':
+    client.run()

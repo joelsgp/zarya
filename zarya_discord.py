@@ -13,15 +13,15 @@ __version__ = '5.x.x'
 
 
 # for recursion
-def run_game():
+def run_game(channel):
     def n():
-        discord_stutter('', skip=True)
+        discord_stutter('', channel=channel, skip=True)
 
     skip = False
 
     # typing output effects
     def stutter(text, delay=lambda: random.randint(1, 3)/100):
-        discord_stutter(text, channel='', delay=delay, skip=skip)
+        discord_stutter(text, channel=channel, delay=delay, skip=skip)
 
     def stutters(text):
         stutter(text, delay=lambda: random.randint(5, 10)/100)
