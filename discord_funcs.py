@@ -4,7 +4,10 @@ import random
 import discord
 
 
-async def stutter(text, channel, delay=lambda: random.randint(1, 3)/100, skip=False):
+# TODO: write docstrings
+
+
+async def discord_stutter(text, channel, delay=lambda: random.randint(1, 3)/100, skip=False):
     if skip:
         await channel.send(text)
     else:
@@ -18,7 +21,7 @@ def input_from_message(message, channel, prefixes=None):
     if not prefixes:
         prefixes = ['>', '9v']
 
-    if message.channel == channel:
+    if not channel or message.channel == channel:
         for prefix in prefixes:
             if message.content.startswith(prefix):
                 return message.content.removeprefix(prefix).strip()
@@ -32,3 +35,7 @@ async def discord_input(client, channel, prefixes=None):
         check = input_from_message(new_message, channel, prefixes)
         if check:
             return check
+
+
+def send_logs(channel, path='log.txt'):
+    channel.send(discord.File(path))
