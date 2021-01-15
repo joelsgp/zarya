@@ -97,4 +97,4 @@ async def play(ctx):
 
 
 if __name__ == '__main__':
-    client.run()
+    client.run(settings['discord']['token'])
