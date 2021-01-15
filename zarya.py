@@ -17,7 +17,7 @@ def run_game():
             print(text)
         else:
             for z in text:
-                print(text[z], end='')
+                print(z, end='')
                 time.sleep(delay())
             n()
 
