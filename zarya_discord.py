@@ -13,27 +13,27 @@ __version__ = '5.x.x'
 
 
 # for recursion
-def run_game(client, channel):
-    def n():
-        discord_stutter('', channel=channel, skip=True)
+async def run_game(client, channel):
+    async def n():
+        await discord_stutter('', channel=channel, skip=True)
 
     skip = False
 
     # typing output effects
-    def stutter(text, delay=lambda: random.randint(1, 3)/100):
-        discord_stutter(text, channel=channel, delay=delay, skip=skip)
+    async def stutter(text, delay=lambda: random.randint(1, 3)/100):
+        await discord_stutter(text, channel=channel, delay=delay, skip=skip)
 
-    def stutters(text):
-        stutter(text, delay=lambda: random.randint(5, 10)/100)
+    async def stutters(text):
+        await stutter(text, delay=lambda: random.randint(5, 10)/100)
 
-    def stutterf(text):
-        stutter(text, lambda: 0.01)
+    async def stutterf(text):
+        await stutter(text, lambda: 0.01)
 
-    def stutterl(text):
+    async def stutterl(text):
         nonlocal skip
         skip_cached = skip
         skip = False
-        stutter(text)
+        await stutter(text)
         skip = skip_cached
 
     inventory = dict()
@@ -60,41 +60,41 @@ def run_game(client, channel):
     functions = list()
 
     # npc interact subroutines
-    def talktocrewmate():
-        stutter('Hello there! Glad to see you got that malfunctioning hatch open.')
+    async def talktocrewmate():
+        await stutter('Hello there! Glad to see you got that malfunctioning hatch open.')
     
     # item use subroutines
-    def usepaper():
-        stutter('The strip of paper has a password on it.')
-        stutter("'Pa$$word123'")
-        stutter('You wonder what it is the password to.')
-        stutter("(That's your cue to wonder what it is the password to)")
+    async def usepaper():
+        await stutter('The strip of paper has a password on it.')
+        await stutter("'Pa$$word123'")
+        await stutter('You wonder what it is the password to.')
+        await stutter("(That's your cue to wonder what it is the password to)")
 
-    def usedrive():
+    async def usedrive():
         if 'laptop' in inventory or 'laptop' in Room['Items']:
             if 'Files' in Drive:
-                stutter('You transfer all the files on the usb stick to the laptop.')
+                await stutter('You transfer all the files on the usb stick to the laptop.')
                 Laptop['Files'] = Drive['Files']
                 del Drive['Files']
             else:
-                stutter('There are no files on the usb stick.')
+                await stutter('There are no files on the usb stick.')
         else:
-            stutter('You have to laptop to use it with.')
+            await stutter('You have to laptop to use it with.')
 
-    def usejumpsuit():
-        stutter('You put on the jumpsuit.')
+    async def usejumpsuit():
+        await stutter('You put on the jumpsuit.')
         Player['Wearing'] = 'RussianJumpsuit'
-        stutter('You were already wearing one, however, so you are now wearing two jumpsuits.')
-        stutter('Good job.')
+        await stutter('You were already wearing one, however, so you are now wearing two jumpsuits.')
+        await stutter('Good job.')
 
-    def usegreenhouse():
-        stutter('You watch the sprouts.')
-        stutters('Nothing interesting happens.')
+    async def usegreenhouse():
+        await stutter('You watch the sprouts.')
+        await stutters('Nothing interesting happens.')
 
-    def usecamera():
+    async def usecamera():
         if 'Windows' in Room:
-            stutterl('You take the camera to a window and, after fiddling with '
-                     'lenses and settings for\na few minutes, take a ')
+            await stutterl('You take the camera to a window and, after fiddling with '
+                           'lenses and settings for\na few minutes, take a ')
             picture_quality = random.randint(1, 10)
             if picture_quality <= 2:
                 picture_type = 'rubbish'
@@ -103,29 +103,29 @@ def run_game(client, channel):
             else:
                 picture_type = 'beautiful'
             picture_name = f'{picture_type} picture'
-            stutter(f'{picture_name}.')
+            await stutter(f'{picture_name}.')
             inventory[picture_name] = picture_quality
         else:
-            stutter('There are no windows to take pictures out of in this module.')
+            await stutter('There are no windows to take pictures out of in this module.')
 
-    def usetoilet():
-        stutter("You do your business in the space toilet. Don't ask an astronaut "
-                "how this \nhappens if you meet one, they're tired of the question.")
+    async def usetoilet():
+        await stutter("You do your business in the space toilet. Don't ask an astronaut "
+                      "how this \nhappens if you meet one, they're tired of the question.")
 
-    def usebed():
-        stutter("You get in the 'bed'.")
+    async def usebed():
+        await stutter("You get in the 'bed'.")
         if Player['Sleep'] > 8:
-            stutter('You sleep until you are no longer tired.')
+            await stutter('You sleep until you are no longer tired.')
             nonlocal FicEpoch
             FicEpoch += Player['Sleep'] * 3600
             Player['Sleep'] = 0
-            stutter('Date: ' + datetime.fromtimestamp(FicEpoch).strftime('%d.%m.%Y'))
+            await stutter('Date: ' + datetime.fromtimestamp(FicEpoch).strftime('%d.%m.%Y'))
         else:
-            stutter('You are not tired enough to get to sleep.')
+            await stutter('You are not tired enough to get to sleep.')
 
-    def uselaptop():
+    async def uselaptop():
         if Laptop['Tutorial'] == 'Pending':
-            stutter('There is a sticker on the laptop that lists things you can do with it.')
+            await stutter('There is a sticker on the laptop that lists things you can do with it.')
             stutterf('browse web')
             stutterf('use messenger app')
             stutterf('read files')
@@ -133,102 +133,102 @@ def run_game(client, channel):
             stutterf('control station module')
             Laptop['Tutorial'] = 'Complete'
             n()
-        stutter('You turn on the laptop.')
+        await stutter('You turn on the laptop.')
         Laptop['State'] = 'On'
         while Laptop['State'] == 'On':
             n()
-            task = discord_input(client, channel)
+            task = await discord_input(client, channel)
             log(task)
             n()
 
             if 'turn off' in task:
-                stutter('You turn off the laptop.')
+                await stutter('You turn off the laptop.')
                 Laptop['State'] = 'Off'
 
             elif task == 'browse web':
-                stutter('A browser window opens. Where do you want to go?')
-                url = discord_input(client, channel)
+                await stutter('A browser window opens. Where do you want to go?')
+                url = await discord_input(client, channel)
                 log(url)
                 try:
                     response = urllib.request.urlopen(url)
                     html = response.read()
                     print(html)
-                    stutter("Hmm, looks like there's no GUI.")
-                    stutter('Oh well.')
+                    await stutter("Hmm, looks like there's no GUI.")
+                    await stutter('Oh well.')
                 except ValueError:
-                    stutter("That's not a valid URL.")
+                    await stutter("That's not a valid URL.")
                 except urllib.error.URLError:
-                    stutter('You have no internet connection.')
+                    await stutter('You have no internet connection.')
 
             elif task == 'read files':
                 if Laptop['Files'] == 'None':
-                    stutter('You have no files to read!')
+                    await stutter('You have no files to read!')
                 else:
-                    stutter('The files say: ')
-                    stutter(Laptop['Files'])
+                    await stutter('The files say: ')
+                    await stutter(Laptop['Files'])
 
             elif task == 'use messenger app':
                 contacts = ['nasa social media team']
-                stutter('In your contacts list are: ')
+                await stutter('In your contacts list are: ')
                 for contact in contacts:
                     stutterf(contact)
 
-                stutter('Who would you like to message?')
+                await stutter('Who would you like to message?')
                 invalid_input = True
                 while invalid_input:
-                    contact = discord_input(client, channel)
+                    contact = await discord_input(client, channel)
                     log(contact)
                     if contact in contacts:
                         invalid_input = False
                         if contact == 'nasa social media team':
-                            stutter('You can send pictures to NASA to be posted online.')
-                            stutter('What picture would you like to send?')
-                            picture = discord_input(client, channel)
+                            await stutter('You can send pictures to NASA to be posted online.')
+                            await stutter('What picture would you like to send?')
+                            picture = await discord_input(client, channel)
                             log(picture)
                             if 'picture' in picture:
                                 if picture in inventory:
-                                    stutter('You send the picture.')
+                                    await stutter('You send the picture.')
                                     likes = inventory[picture] * random.randint(10, 1000)
-                                    stutter('Your picture gets ' + str(likes) + ' likes.')
+                                    await stutter('Your picture gets ' + str(likes) + ' likes.')
                                     del inventory[picture]
                                 else:
-                                    stutter("You don't have that picture.")
+                                    await stutter("You don't have that picture.")
                             else:
-                                stutter("That's not a picture!")
+                                await stutter("That's not a picture!")
                     else:
-                        stutter("They aren't in your contacts list.")
+                        await stutter("They aren't in your contacts list.")
 
             elif task == 'play text game':
-                run_game()
+                await run_game()
 
             elif task == 'control station module':
-                stutter('A window opens with a few readouts and options.')
-                stutter('periapsis: 390km')
-                stutter('apoapsis: 390km')
-                stutter('inclination: 51.6°')
-                stutter('orbital period: 93 minutes')
-                stutter('thruster statuses: nominal')
-                stutter('alignment: retrograde')
-                stutter("There is a button that says 'fire main engines'.")
-                stutter('Would you like to press it?')
-                choice = discord_input(client, channel)
+                await stutter('A window opens with a few readouts and options.')
+                await stutter('periapsis: 390km')
+                await stutter('apoapsis: 390km')
+                await stutter('inclination: 51.6°')
+                await stutter('orbital period: 93 minutes')
+                await stutter('thruster statuses: nominal')
+                await stutter('alignment: retrograde')
+                await stutter("There is a button that says 'fire main engines'.")
+                await stutter('Would you like to press it?')
+                choice = await discord_input(client, channel)
                 log(choice)
                 if 'yes' in choice:
-                    stutter('You press the button and tons of Gs force you against the back of the module.')
-                    stutter("This is a cargo module, which means there's no seat to help you.")
-                    stutter('Your orbit is rapidly falling deeper into the atmosphere.')
-                    stutter('The remains of the module hits the ground at terminal velocity.')
-                    stutter("But it's ok, because you were already obliterated "
+                    await stutter('You press the button and tons of Gs force you against the back of the module.')
+                    await stutter("This is a cargo module, which means there's no seat to help you.")
+                    await stutter('Your orbit is rapidly falling deeper into the atmosphere.')
+                    await stutter('The remains of the module hits the ground at terminal velocity.')
+                    await stutter("But it's ok, because you were already obliterated "
                             'when its unshielded mass burnt up violently in the atmosphere.')
-                    stutters('GAME OVER')
+                    await stutters('GAME OVER')
                     Carry['On'] = False
-                    discord_input(client, channel)
+                    await discord_input(client, channel)
                     break
                 else:
-                    stutter('That was probably a sensible choice.')
+                    await stutter('That was probably a sensible choice.')
 
             else:
-                stutter("The laptop can't do that!")
+                await stutter("The laptop can't do that!")
 
     # items
     Laptop = {'Name': 'Laptop', 'Desc': ' a laptop on the wall.',
@@ -328,80 +328,80 @@ def run_game(client, channel):
     # start game
     Room = Zarya
     FicEpoch = 968716800
-    stutterf(f'Zarya v{__version__}')
-    stutterf('© Joel McBride 2017, 2021')
-    stutterf("Remember to report any bugs or errors to 'joel.mcbride1@live.com'.")
-    n()
-    stutter('Date: ' + datetime.fromtimestamp(FicEpoch).strftime('%d.%m.%Y'))
-    stutter("For a list of commands, type 'help'.")
+    await stutterf(f'Zarya v{__version__}')
+    await stutterf('© Joel McBride 2017, 2021')
+    await stutterf("Remember to report any bugs or errors to 'joel.mcbride1@live.com'.")
+    await n()
+    await stutter('Date: ' + datetime.fromtimestamp(FicEpoch).strftime('%d.%m.%Y'))
+    await stutter("For a list of commands, type 'help'.")
 
     # command reader
     Carry = {'On': True}
     while Carry['On']:
         Player['Sleep'] += 1
         FicEpoch += 3600
-        n()
-        Do = str.lower(discord_input(client, channel))
+        await n()
+        Do = str.lower(await discord_input(client, channel))
         log(Do)
-        n()
+        await n()
 
         if Do in ['help', 'h']:
             for help_info_item in help_info:
-                stutterf(help_info_item)
-            stutter('For the uninitiated: ')
-            stutter('In text-based adventure games, a good first command when '
+                await stutterf(help_info_item)
+            await stutter('For the uninitiated: ')
+            await stutter('In text-based adventure games, a good first command when '
                     "starting out or \nentering a new place is 'look around'.")
 
         elif Do in ['quit', 'q']:
             break
 
         elif Do in ['look around', 'look', 'la', 'l']:
-            stutter('You are ' + Room['Desc'] + ' ')
+            await stutter('You are ' + Room['Desc'] + ' ')
             Items = Room['Items']
             if len(Items) > 0:
                 ItemVars = list(Items.values())
                 for i, value in enumerate(Items):
-                    stutter(f"There is{ItemVars[i]['Desc']}")
+                    await stutter(f"There is{ItemVars[i]['Desc']}")
             if 'Ports' in Room:
-                stutter('There are ' + str(len(Room['Ports'])) + ' ports: ')
+                await stutter('There are ' + str(len(Room['Ports'])) + ' ports: ')
                 Ports = Room['Ports']
                 PortTypes = list(Ports.keys())
                 PortStates = list(Ports.values())
                 for i, value in enumerate(Room['Ports']):
-                    stutter(f'One to {PortTypes[i]} that is {PortStates[i]}.')
+                    await stutter(f'One to {PortTypes[i]} that is {PortStates[i]}.')
 
         elif Do in ['show inventory', 'inventory', 'si', 'i']:
             if not inventory:
-                stutter('Your inventory is empty.')
+                await stutter('Your inventory is empty.')
             else:
                 you_have = list(inventory)
-                stutter('In your inventory is: ')
+                await stutter('In your inventory is: ')
                 for inventory_item in inventory:
-                    stutter(you_have[inventory_item])
+                    await stutter(you_have[inventory_item])
 
         elif 'search' in Do:
             Object = Do[7:]
             if Object in Room['Objects']:
                 PrevRoom = Room
-                stutter(f'You search the {Object}.')
+                await stutter(f'You search the {Object}.')
                 ObjectIndx = Room['Objects']
                 Room = ObjectIndx[Object]
                 Items = list(Room['Items'])
                 if len(Items) > 0:
-                    stutter(f'The {Object} contain(s):')
+                    await stutter(f'The {Object} contain(s):')
                     for item in Items:
-                        stutter(item)
+                        await stutter(item)
                 else:
-                    stutter("There isn't anything here.")
+                    await stutter("There isn't anything here.")
             else:
-                stutter("That isn't in here.")
+                await stutter("That isn't in here.")
 
         elif 'leave' in Do:
             if Room['Leavable'] == 1:
-                stutter('You leave the ' + str.lower(Room['Name']) + '.')
+                await stutter('You leave the ' + str.lower(Room['Name']) + '.')
                 Room = PrevRoom
             else:
-                stutter(f"I'm sorry {Player['Name']}, I'm afraid you can't do that.")
+                await stutter(f"I'm sorry {Player['Name']}, I'm afraid you can't do that.")
 
         elif 'go through' in Do or 'gt' in Do or 'go' in Do:
             if 'go through' in Do and 'port' in Do:
@@ -421,19 +421,19 @@ def run_game(client, channel):
                 if Ports[Direction] == 'open':
                     Near = Room['Near']
                     NextRoom = Near[Direction]
-                    stutter('You go through the port into ' + NextRoom + '.')
+                    await stutter('You go through the port into ' + NextRoom + '.')
                     Room = eval(Near[Direction])
                 else:
-                    stutter('That port is closed.')
+                    await stutter('That port is closed.')
             else:
-                stutter("The module you're in doesn't have a port there.")
+                await stutter("The module you're in doesn't have a port there.")
 
         elif Do in ['take all', 'ta']:
             ItemsList = list(Room['Items'])
             if len(ItemsList) > 0:
-                stutter('You: ')
-                stutter('TAKE ')
-                stutter('ALL THE THINGS.')
+                await stutter('You: ')
+                await stutter('TAKE ')
+                await stutter('ALL THE THINGS.')
                 Items = Room['Items']
                 for i, value in enumerate(Items):
                     Item = ItemsList[i]
@@ -443,9 +443,9 @@ def run_game(client, channel):
                         inventory[Item] = Details
                         del Items[Item]
                     else:
-                        stutter(f"You can't take the {Item}.")
+                        await stutter(f"You can't take the {Item}.")
             else:
-                stutter("There's nothing here.")
+                await stutter("There's nothing here.")
 
         elif 'take' in Do:
             Item = Do[5:]
@@ -454,13 +454,13 @@ def run_game(client, channel):
             if Item in Items:
                 TrueItem = str.upper(Item[0]) + Item[1:]
                 if 'Takeable' in eval(TrueItem):
-                    stutter('You take the ' + Item + '.')
+                    await stutter('You take the ' + Item + '.')
                     inventory[Item] = Details
                     del Items[Item]
                 else:
-                    stutter("You can't take that.")
+                    await stutter("You can't take that.")
             else:
-                stutter("That item isn't here.")
+                await stutter("That item isn't here.")
 
         elif 'use' in Do:
             Item = Do[4:]
@@ -470,36 +470,36 @@ def run_game(client, channel):
                     SubCall = 'use' + str(Item) + '()'
                     eval(SubCall)
                 else:
-                    stutter("That item isn't usable.")
+                    await stutter("That item isn't usable.")
             else:
-                stutter("You don't have that item.")
+                await stutter("You don't have that item.")
 
         elif 'drop' in Do:
             Item = Do[5:]
             if Item in inventory:
-                stutter('You drop the ' + Item + '.')
+                await stutter('You drop the ' + Item + '.')
                 Items = Room['Items']
                 Details = inventory[Item]
                 Items[Item] = Details
                 del inventory[Item]
             else:
-                stutter("That item isn't in your inventory.")
+                await stutter("That item isn't in your inventory.")
 
         elif Do in ['skip', 's']:
             skip = True
-            stutter('Text will now output instantly.')
+            await stutter('Text will now output instantly.')
 
         elif Do in ['noskip', 'ns', 'n']:
             skip = False
-            stutter('Text will now output gradually.')
+            await stutter('Text will now output gradually.')
 
         elif Do.startswith('setname'):
             new_name = Do.removeprefix('setname').strip()
             Player['Name'] = new_name
-            stutter(f"Your name is {Player['Name']}.")
+            await stutter(f"Your name is {Player['Name']}.")
 
         else:
-            stutter("That's not a valid command.")
+            await stutter("That's not a valid command.")
 
 
 # logging
