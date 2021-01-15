@@ -383,7 +383,8 @@ async def run_game(client, send_channel, req_channel_name):
             await stutter('I made this game as one of my first reasonably large projects about four years ago '
                           '(2016). It was very poorly coded but I worked quite a while on it, although after I '
                           "finished most of the framework stuff I couldn't be bothered to add much more content. "
-                          "The writing, what there is, is ok, it's got some funny bits I guess. "
+                          "The writing, what there is, is ok, it's got some funny bits I guess. It's also very "
+                          'well researched, everything in the game is on the ISS in real life - including Zarya. '
                           'Anyway, I had the idea recently (2021) to make a text based adventure game for Discord, '
                           'so I went back to my old project, touched the code up a bit, ported it, and here we are.')
 
