@@ -469,20 +469,11 @@ def log(text):
         log_file.write('\n' + str(text))
 
 
-# log new game
-log('\n')
-log('hello world!')
-log(str(datetime.now()))
+if __name__ == '__main__':
+    # log new game
+    log('\n')
+    log('hello world!')
+    log(str(datetime.now()))
 
-# run
-try:
+    # run
     run_game()
-    quit()
-except:
-    import sys
-    err = sys.exc_info()
-    if not 'SystemExit' in str(err):
-        log(err)
-        print('ERROR')
-        print(err)
-        Delay = input()
