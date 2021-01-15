@@ -231,34 +231,51 @@ async def run_game(client, send_channel, req_channel_name):
                 await stutter("The laptop can't do that!")
 
     # items
-    Laptop = {'Name': 'Laptop', 'Desc': ' a laptop on the wall.',
-              'Usable': 'Yes', 'Takeable': 'Yes',
-              'State': 'Off', 'Tutorial': 'Pending', 'Files': 'None'}
+    Laptop = {
+        'Name': 'Laptop', 'Desc': ' a laptop on the wall.',
+        'Usable': 'Yes', 'Takeable': 'Yes',
+        'State': 'Off', 'Tutorial': 'Pending', 'Files': 'None',
+        'usefunc': uselaptop,
+    }
 
-    Paper = {'Name': 'Paper', 'Desc': ' a strip of paper.',
-             'Usable': 'Yes', 'Takeable': 'Yes'}
-    Drive = {'Name': 'Drive', 'Desc': ' a usb stick.',
-             'Usable': 'Yes', 'Takeable': 'Yes',
-             'Files': "'print('hello world!')'"}
-    Jumpsuit = {'Name': 'Jumpsuit',
-                'Desc': ' a blue jumpsuit with the flag of THE GLORIOUS SOVIET UNION I mean, Russia, on it.',
-                'Usable': 'Yes', 'Takeable': 'Yes'}
+    Paper = {
+        'Name': 'Paper', 'Desc': ' a strip of paper.',
+        'Usable': 'Yes', 'Takeable': 'Yes'
+    }
+    Drive = {
+        'Name': 'Drive', 'Desc': ' a usb stick.',
+        'Usable': 'Yes', 'Takeable': 'Yes',
+        'Files': "'print('hello world!')'"
+    }
+    Jumpsuit = {
+        'Name': 'Jumpsuit',
+        'Desc': ' a blue jumpsuit with the flag of THE GLORIOUS SOVIET UNION I mean, Russia, on it.',
+        'Usable': 'Yes', 'Takeable': 'Yes'
+    }
 
-    Greenhouse = {'Name': 'Lada',
-                  'Desc': ' a little greenhouse thing with sprouts growing in it.',
-                  'Usable': 'Yes'}
-    Camera = {'Name': 'Camera', 'Desc': ' a DSLR camera and a few lenses on the wall.',
-              'Usable': 'Yes', 'Takeable': 'Yes'}
-    Toilet = {'Name': 'Space Toilet', 'Desc': ' a bogstandard space toilet in a little cubicle. Pun intended.',
-              'Usable': 'Yes'}
-    Bed = {'Name': 'Sleeping Bag',
-           'Desc': ' a simple sleeping bag strapped securely to a wall.',
-           'Usable': 'Yes'}
+    Greenhouse = {
+        'Name': 'Lada',
+        'Desc': ' a little greenhouse thing with sprouts growing in it.',
+        'Usable': 'Yes'
+    }
+    Camera = {
+        'Name': 'Camera', 'Desc': ' a DSLR camera and a few lenses on the wall.',
+        'Usable': 'Yes', 'Takeable': 'Yes'
+    }
+    Toilet = {
+        'Name': 'Space Toilet', 'Desc': ' a bogstandard space toilet in a little cubicle. Pun intended.',
+        'Usable': 'Yes'
+    }
+    Bed = {
+        'Name': 'Sleeping Bag',
+        'Desc': ' a simple sleeping bag strapped securely to a wall.',
+        'Usable': 'Yes'
+    }
 
     # objects
     ContainersItems = {'paper': Paper, 'drive': Drive, 'jumpsuit': Jumpsuit}
     Containers = {'Name': 'Containers', 'Items': ContainersItems,
-                  'Leavable': 1,
+                  'Leavable': True,
                   'Desc': 'looking in the containers lining the walls.'}
 
     # rooms
@@ -267,7 +284,7 @@ async def run_game(client, send_channel, req_channel_name):
     ZaryaItems = {'laptop': Laptop}
     ZaryaObjects = {'containers': Containers}
     Zarya = {
-        'Name': 'Zarya', 'Leavable': 0,
+        'Name': 'Zarya', 'Leavable': False,
         'Ports': ZaryaPorts, 'Near': ZaryaNear,
         'Items': ZaryaItems, 'Objects': ZaryaObjects,
         'Desc': 'in a bland white module, what may sometimes be considered the walls \nlined with storage ' 
@@ -283,7 +300,7 @@ async def run_game(client, send_channel, req_channel_name):
     UnityItems = dict()
     UnityObjects = dict()
     Unity = {
-        'Name': 'Unity', 'Leavable': 0,
+        'Name': 'Unity', 'Leavable': False,
         'Ports': UnityPorts, 'Near': UnityNear,
         'Items': UnityItems, 'Objects': UnityObjects,
         'Desc': 'in one of the nodes that links part of the station. '
@@ -467,7 +484,7 @@ async def run_game(client, send_channel, req_channel_name):
             if Item in inventory or Item in Room['Items']:
                 TrueItem = str.upper(Item[0]) + Item[1:]
                 if 'Usable' in eval(TrueItem):
-                    SubCall = 'use' + str(Item) + '()'
+                    SubCall = f'await use{str(Item)}()'
                     eval(SubCall)
                 else:
                     await stutter("That item isn't usable.")
