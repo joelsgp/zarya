@@ -497,6 +497,11 @@ def run_game():
             skip = False
             stutter('Text will now output gradually.')
 
+        elif Do.startswith('setname'):
+            new_name = Do.removeprefix('setname').strip()
+            Player['Name'] = new_name
+            stutter(f"Your name is {Player['Name']}.")
+
         else:
             stutter("That's not a valid command.")
 

@@ -1,0 +1,7 @@
+{
+  "skip": false,
+  "random_delay": true,
+  "delay_lower": 1,
+  "delay_upper": 3,
+  "delay_static": 1
+}
