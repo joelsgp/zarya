@@ -93,6 +93,8 @@ async def run_game(client, send_channel, req_channel_name):
 
     # TODO: fix bug with KeyError taking the camera
     # TODO: fix bug with using camera
+    # TODO: combine string literals to help with rate limiting
+    # TODO: move todos into relevant places :p
     async def usecamera():
         if 'Windows' in Room:
             await stutterl('You take the camera to a window and, after fiddling with '
