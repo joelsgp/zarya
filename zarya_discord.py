@@ -145,7 +145,7 @@ async def run_game(client, send_channel, req_channel_name):
                 await stutter('You turn off the laptop.')
                 Laptop['State'] = 'Off'
 
-            elif task == 'browse web':
+            elif task in ['browse web', 'browse', 'web']:
                 await stutter('A browser window opens. Where do you want to go?')
                 url = await discord_input(client, req_channel_name)
                 log(url)
@@ -160,14 +160,14 @@ async def run_game(client, send_channel, req_channel_name):
                 except urllib.error.URLError:
                     await stutter('You have no internet connection.')
 
-            elif task == 'read files':
+            elif task in ['read files', 'read', 'files']:
                 if Laptop['Files'] == 'None':
                     await stutter('You have no files to read!')
                 else:
                     await stutter('The files say: ')
                     await stutter(Laptop['Files'])
 
-            elif task == 'use messenger app':
+            elif task in ['use messenger app', 'messenger app', 'messenger']:
                 contacts = ['nasa social media team']
                 await stutter('In your contacts list are: ')
                 for contact in contacts:
@@ -180,7 +180,7 @@ async def run_game(client, send_channel, req_channel_name):
                     log(contact)
                     if contact in contacts:
                         invalid_input = False
-                        if contact == 'nasa social media team':
+                        if contact in 'nasa social media team':
                             await stutter('You can send pictures to NASA to be posted online.')
                             await stutter('What picture would you like to send?')
                             picture = await discord_input(client, req_channel_name)
@@ -198,10 +198,10 @@ async def run_game(client, send_channel, req_channel_name):
                     else:
                         await stutter("They aren't in your contacts list.")
 
-            elif task == 'play text game':
+            elif task in 'play text game':
                 await run_game()
 
-            elif task == 'control station module':
+            elif task in 'control station module':
                 await stutter('A window opens with a few readouts and options.')
                 await stutter('periapsis: 390km')
                 await stutter('apoapsis: 390km')
@@ -219,7 +219,7 @@ async def run_game(client, send_channel, req_channel_name):
                     await stutter('Your orbit is rapidly falling deeper into the atmosphere.')
                     await stutter('The remains of the module hits the ground at terminal velocity.')
                     await stutter("But it's ok, because you were already obliterated "
-                            'when its unshielded mass burnt up violently in the atmosphere.')
+                                  'when its unshielded mass burnt up violently in the atmosphere.')
                     await stutters('GAME OVER')
                     Carry['On'] = False
                     await discord_input(client, req_channel_name)
