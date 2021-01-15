@@ -34,9 +34,9 @@ def run_game():
         stutter(text)
         skip = skip_cached
 
-    Inventory = dict()
+    inventory = dict()
 
-    #list of commands for help
+    # list of commands for help
     Help = list()
     Functions = list()
     Help.append('help -Shows a list of commands')
@@ -55,12 +55,12 @@ def run_game():
     Help.append('Note:')
     Help.append('You can also use abbrevitations for some commands.')
 
-    #npc interact subroutines
+    # npc interact subroutines
     def talktocrewmate():
         stutter('Hello there! Glad to see you got that malfunctioning hatch '\
                 'open.')
     
-    #item use subroutines
+    # item use subroutines
     def usepaper():
         stutter('The strip of paper has a password on it.')
         stutter('\'Pa$$word123\'')
@@ -68,7 +68,7 @@ def run_game():
         stutter('(That\'s your cue to wonder what it is the password to)')
 
     def usedrive():
-        if 'laptop' in Inventory or 'laptop' in Room['Items']:
+        if 'laptop' in inventory or 'laptop' in Room['Items']:
             if 'Files' in Drive:
                 stutter('You transfer all the files on the usb stick to the laptop.')
                 Laptop['Files'] = Drive['Files']
@@ -102,7 +102,7 @@ def run_game():
                 PictureType = 'beautiful'
             Name = str(PictureType + ' picture')
             stutter(Name + '.')
-            Inventory[Name] = PictureQuality
+            inventory[Name] = PictureQuality
         else:
             stutter('There are no windows to take pictures out of in this module.')
 
@@ -179,11 +179,11 @@ def run_game():
                             Picture = input()
                             log(Picture)
                             if 'picture' in Picture:
-                                if Picture in Inventory:
+                                if Picture in inventory:
                                     stutter('You send the picture.')
-                                    Likes = Inventory[Picture] * random.randint(10, 1000)
+                                    Likes = inventory[Picture] * random.randint(10, 1000)
                                     stutter('Your picture gets ' + str(Likes) + ' likes.')
-                                    del Inventory[Picture]
+                                    del inventory[Picture]
                                 else:
                                     stutter('You don\'t have that picture.')
                             else:
@@ -220,7 +220,7 @@ def run_game():
             else:
                 stutter('The laptop can\'t do that!')
 
-    #items
+    # items
     Laptop = {'Name': 'Laptop', 'Desc': ' a laptop on the wall.',
               'Usable': 'Yes', 'Takeable': 'Yes',
               'State': 'Off', 'Tutorial': 'Pending', 'Files': 'None'}
@@ -247,13 +247,13 @@ def run_game():
               'securely to a wall.',
               'Usable': 'Yes'}
 
-    #objects
+    # objects
     ContainersItems = {'paper': Paper, 'drive': Drive, 'jumpsuit': Jumpsuit}
     Containers = {'Name': 'Containers', 'Items': ContainersItems,
                   'Leavable': 1,
                   'Desc': 'looking in the containers lining the walls.'}
 
-    #rooms
+    # rooms
     ZaryaPorts = {'front': 'open', 'nadir': 'closed', 'aft': 'open'}
     ZaryaNear = {'front': 'Unity', 'aft': 'Zvezda'}
     ZaryaItems = {'laptop': Laptop}
@@ -290,9 +290,9 @@ def run_game():
               'quarters and life support, where things are done, and to aft a ' \
               '\'Transfer Chamber\'.'}
 
-    #player
+    # player
     Player = {'Name': 'Player', 'Wearing': 'Jumpsuit',
-              'Inventory': Inventory, 'Images': 0, 'Sleep': 5}
+              'Inventory': inventory, 'Images': 0, 'Sleep': 5}
 
     def helpwindow():
         helpw = Tk()
@@ -305,7 +305,7 @@ def run_game():
 
     Months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
 
-    #start game
+    # start game
     Room = Zarya
     FicEpoch = 968716800
     stutterf('Zarya v4.05')
@@ -314,7 +314,7 @@ def run_game():
     n()
     stutter('Date: ' + datetime.fromtimestamp(FicEpoch).strftime('%d.%m.%Y'))
     stutter('For a list of commands, type \'help\'.')
-    #command reader
+    # command reader
     Carry = {'On': True}
     while Carry['On'] == True:
         Player['Sleep'] += 1
@@ -347,12 +347,12 @@ def run_game():
                 for i in range (len(Room['Ports'])):
                     stutter('One to ' + PortTypes[i] + ' that is ' + PortStates[i] + '.')
         elif Do == 'show inventory' or Do == 'inventory' or Do == 'si' or Do == 'i':
-            if len(Inventory) == 0:
+            if len(inventory) == 0:
                 stutter('Your inventory is empty.')
             else:
-                YouHave = list(Inventory)
+                YouHave = list(inventory)
                 stutter('In your inventory is: ')
-                for i in range (len(Inventory)):
+                for i in range (len(inventory)):
                     stutter(YouHave[i])
         elif 'search' in Do:
             Object = Do[7:]
@@ -412,7 +412,7 @@ def run_game():
                     TrueItem = str.upper(Item[0]) + Item[1:]
                     if 'Takeable' in eval(TrueItem):
                         Details = Items[Item]
-                        Inventory[Item] = Details
+                        inventory[Item] = Details
                         del Items[Item]
                     else:
                         stutter('You can\'t take the ' + Item + '.')
@@ -426,7 +426,7 @@ def run_game():
                 TrueItem = str.upper(Item[0]) + Item[1:]
                 if 'Takeable' in eval(TrueItem):
                     stutter('You take the ' + Item + '.')
-                    Inventory[Item] = Details
+                    inventory[Item] = Details
                     del Items[Item]
                 else:
                     stutter('You can\'t take that.')
@@ -434,7 +434,7 @@ def run_game():
                 stutter('That item isn\'t here.')
         elif 'use' in Do:
             Item = Do[4:]
-            if Item in Inventory or Item in Room['Items']:
+            if Item in inventory or Item in Room['Items']:
                 TrueItem = str.upper(Item[0]) + Item[1:]
                 if 'Usable' in eval(TrueItem):
                     SubCall = 'use' + str(Item) + '()'
@@ -445,12 +445,12 @@ def run_game():
                 stutter('You don\'t have that item.')
         elif 'drop' in Do:
             Item = Do[5:]
-            if Item in Inventory:
+            if Item in inventory:
                 stutter('You drop the ' + Item + '.')
                 Items = Room['Items']
-                Details = Inventory[Item]
+                Details = inventory[Item]
                 Items[Item] = Details
-                del Inventory[Item]
+                del inventory[Item]
             else:
                 stutter('That item isn\'t in your inventory.')
         elif Do == 'skip' or Do == 's':
@@ -462,17 +462,19 @@ def run_game():
         else:
             stutter('That\'s not a valid command.')
 
-#logging
-def log(Text):
-    LogFile = open('log.txt', 'a+')
-    LogFile.write('\n' + str(Text))
-    LogFile.close()
-#log newgame
+
+# logging
+def log(text):
+    with open('log.txt', 'a+') as log_file:
+        log_file.write('\n' + str(text))
+
+
+# log new game
 log('\n')
 log('hello world!')
 log(str(datetime.now()))
 
-#run
+# run
 try:
     run_game()
     quit()
