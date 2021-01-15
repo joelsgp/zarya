@@ -13,15 +13,15 @@ __version__ = '0.1.0'
 
 
 # for recursion
-async def run_game(client, channel):
+async def run_game(client, send_channel, req_channel_name):
     async def n():
-        await discord_stutter('', channel=channel, skip=True)
+        await discord_stutter('', channel=send_channel, skip=True)
 
     skip = False
 
     # typing output effects
     async def stutter(text, delay=lambda: random.randint(1, 3)/100):
-        await discord_stutter(text, channel=channel, delay=delay, skip=skip)
+        await discord_stutter(text, channel=send_channel, delay=delay, skip=skip)
 
     async def stutters(text):
         await stutter(text, delay=lambda: random.randint(5, 10)/100)
@@ -137,7 +137,7 @@ async def run_game(client, channel):
         Laptop['State'] = 'On'
         while Laptop['State'] == 'On':
             n()
-            task = await discord_input(client, channel)
+            task = await discord_input(client, req_channel_name)
             log(task)
             n()
 
@@ -147,7 +147,7 @@ async def run_game(client, channel):
 
             elif task == 'browse web':
                 await stutter('A browser window opens. Where do you want to go?')
-                url = await discord_input(client, channel)
+                url = await discord_input(client, req_channel_name)
                 log(url)
                 try:
                     response = urllib.request.urlopen(url)
@@ -176,14 +176,14 @@ async def run_game(client, channel):
                 await stutter('Who would you like to message?')
                 invalid_input = True
                 while invalid_input:
-                    contact = await discord_input(client, channel)
+                    contact = await discord_input(client, req_channel_name)
                     log(contact)
                     if contact in contacts:
                         invalid_input = False
                         if contact == 'nasa social media team':
                             await stutter('You can send pictures to NASA to be posted online.')
                             await stutter('What picture would you like to send?')
-                            picture = await discord_input(client, channel)
+                            picture = await discord_input(client, req_channel_name)
                             log(picture)
                             if 'picture' in picture:
                                 if picture in inventory:
@@ -211,7 +211,7 @@ async def run_game(client, channel):
                 await stutter('alignment: retrograde')
                 await stutter("There is a button that says 'fire main engines'.")
                 await stutter('Would you like to press it?')
-                choice = await discord_input(client, channel)
+                choice = await discord_input(client, req_channel_name)
                 log(choice)
                 if 'yes' in choice:
                     await stutter('You press the button and tons of Gs force you against the back of the module.')
@@ -222,7 +222,7 @@ async def run_game(client, channel):
                             'when its unshielded mass burnt up violently in the atmosphere.')
                     await stutters('GAME OVER')
                     Carry['On'] = False
-                    await discord_input(client, channel)
+                    await discord_input(client, req_channel_name)
                     break
                 else:
                     await stutter('That was probably a sensible choice.')
@@ -341,7 +341,7 @@ async def run_game(client, channel):
         Player['Sleep'] += 1
         FicEpoch += 3600
         await n()
-        Do = str.lower(await discord_input(client, channel))
+        Do = str.lower(await discord_input(client, req_channel_name))
         log(Do)
         await n()
 

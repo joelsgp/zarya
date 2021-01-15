@@ -92,6 +92,11 @@ async def send_logs(channel, path='log.txt'):
 client = discord.ext.commands.bot.Bot(command_prefix=('>', '9v'))
 
 
+@client.event()
+async def on_ready():
+    print('Bot running.')
+
+
 @client.command(aliases=['log', 'log.txt'])
 async def logs(ctx):
     await send_logs(ctx.channel)
@@ -100,7 +105,8 @@ async def logs(ctx):
 @client.command()
 async def play(ctx):
     zarya_discord.log_start()
-    await zarya_discord.run_game(client, ctx.channel)
+    # await zarya_discord.run_game(client, ctx.channel, settings['discord']['channel'])
+    await zarya_discord.run_game(client, ctx.channel, ctx.channel.name)
 
 
 if __name__ == '__main__':
