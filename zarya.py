@@ -1,51 +1,38 @@
-from random import randint
-from time import sleep
+import random
+import time
 from urllib import request
 from datetime import datetime
 
-#for recursion
-def rungame():
-    #newline
+
+# for recursion
+def run_game():
     def n():
         print('')
 
-    Skip = False
+    skip = False
 
-    #typing output effects
-    def stutter(Text):
-        for z in range (len(Text)):
-            if Skip == True:
-                print(Text, end='')
-                break
-            print(Text[z], end='')
-            sleep(randint(1,3)/100)
-        print('')
+    # typing output effects
+    def stutter(text, delay=lambda: random.randint(1, 3)/100):
+        if skip:
+            print(text)
+        else:
+            for z in text:
+                print(text[z], end='')
+                time.sleep(delay())
+            n()
 
-    def stutters(Text):
-        for z in range (len(Text)):
-            if Skip == True:
-                print(Text, end='')
-                break
-            print(Text[z], end='')
-            sleep(randint(5,10)/100)
-        print('')
+    def stutters(text):
+        stutter(text, delay=lambda: random.randint(5, 10)/100)
 
-    def stutterf(Text):
-        for z in range (len(Text)):
-            if Skip == True:
-                print(Text, end='')
-                break
-            print(Text[z], end='')
-            sleep(0.01)
-        print('')
+    def stutterf(text):
+        stutter(text, lambda: 0.01)
 
-    def stutterl(Text):
-        for z in range (len(Text)):
-            if Skip == True:
-                print(Text, end='')
-                break
-            print(Text[z], end='')
-            sleep(randint(1,3)/100)
+    def stutterl(text):
+        nonlocal skip
+        skip_cached = skip
+        skip = False
+        stutter(text)
+        skip = skip_cached
 
     Inventory = dict()
 
@@ -106,7 +93,7 @@ def rungame():
         if 'Windows' in Room:
             stutterl('You take the camera to a window and, after fiddling with ' \
                     'lenses and settings for\na few minutes, take a ')
-            PictureQuality = randint(1, 10)
+            PictureQuality = random.randint(1, 10)
             if PictureQuality <= 2:
                 PictureType = 'rubbish'
             elif PictureQuality <= 5:
@@ -194,7 +181,7 @@ def rungame():
                             if 'picture' in Picture:
                                 if Picture in Inventory:
                                     stutter('You send the picture.')
-                                    Likes = Inventory[Picture] * randint(10, 1000)
+                                    Likes = Inventory[Picture] * random.randint(10, 1000)
                                     stutter('Your picture gets ' + str(Likes) + ' likes.')
                                     del Inventory[Picture]
                                 else:
@@ -204,7 +191,7 @@ def rungame():
                     else:
                         stutter('They aren\'t in your contacts list.')
             elif Task == 'play text game':
-                rungame()
+                run_game()
             elif Task == 'control station module':
                 stutter('A window opens with a few readouts and options.')
                 stutter('periapsis: 390km')
@@ -467,10 +454,10 @@ def rungame():
             else:
                 stutter('That item isn\'t in your inventory.')
         elif Do == 'skip' or Do == 's':
-            Skip = True
+            skip = True
             stutter('Text will now output instantly.')
         elif Do == 'noskip' or Do == 'n' or Do == 'ns':
-            Skip = False
+            skip = False
             stutter('Text will now output gradually.')
         else:
             stutter('That\'s not a valid command.')
@@ -487,7 +474,7 @@ log(str(datetime.now()))
 
 #run
 try:
-    rungame()
+    run_game()
     quit()
 except:
     import sys
