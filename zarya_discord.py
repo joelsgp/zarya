@@ -392,6 +392,7 @@ async def run_game(client, send_channel, req_channel_name):
             pass
 
         elif Do in ['quit', 'q']:
+            await discord_stutter('Thanks for playing!', send_channel)
             break
 
         elif Do in ['look around', 'look', 'la', 'l']:
