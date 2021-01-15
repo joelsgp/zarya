@@ -243,7 +243,7 @@ def run_game():
              'Usable': 'Yes', 'Takeable': 'Yes'}
     Drive = {'Name': 'Drive', 'Desc': ' a usb stick.',
              'Usable': 'Yes', 'Takeable': 'Yes',
-             'Files': '\'print(\'hello world!\')\''}
+             'Files': "'print('hello world!')'"}
     Jumpsuit = {'Name': 'Jumpsuit',
                 'Desc': ' a blue jumpsuit with the flag of THE GLORIOUS SOVIET UNION I mean, Russia, on it.',
                 'Usable': 'Yes', 'Takeable': 'Yes'}
@@ -405,7 +405,7 @@ def run_game():
                 stutter('You leave the ' + str.lower(Room['Name']) + '.')
                 Room = PrevRoom
             else:
-                stutter('I\'m sorry ' + Player['Name'] + ', you can\'t do that.')
+                stutter(f"I'm sorry {Player['Name']}, I'm afraid you can't do that.")
 
         elif 'go through' in Do or 'gt' in Do or 'go' in Do:
             if 'go through' in Do and 'port' in Do:
