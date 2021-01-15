@@ -8,6 +8,13 @@ import discord.ext.commands
 import zarya_discord
 
 
+# Add links:
+# Send Messages; Attach Files:
+# https://discord.com/api/oauth2/authorize?client_id=799634237355065395&permissions=34816&scope=bot
+# Administrator:
+# https://discord.com/api/oauth2/authorize?client_id=799634237355065395&permissions=8&scope=bot
+
+
 with open('settings.json', 'r') as settings_json:
     settings = json.load(settings_json)
 
