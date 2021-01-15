@@ -33,7 +33,7 @@ async def discord_stutter(text, channel, delay=lambda: random.randint(1, 3)/100,
     else:
         message = await channel.send(text[0])
         for i in range(2, len(text)):
-            await message.edit(text[:i])
+            await message.edit(content=text[:i])
             time.sleep(delay())
 
 
