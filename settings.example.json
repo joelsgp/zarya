@@ -1,7 +1,8 @@
 {
   "discord": {
     "token": "",
-    "channel": ""
+    "channel": "",
+    "prefixes": [">", "9v"]
   },
 
   "game": {
