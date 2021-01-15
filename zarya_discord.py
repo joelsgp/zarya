@@ -91,6 +91,8 @@ async def run_game(client, send_channel, req_channel_name):
         await stutter('You watch the sprouts.')
         await stutters('Nothing interesting happens.')
 
+    # TODO: fix bug with KeyError taking the camera
+    # TODO: fix bug with using camera
     async def usecamera():
         if 'Windows' in Room:
             await stutterl('You take the camera to a window and, after fiddling with '
