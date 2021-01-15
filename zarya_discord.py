@@ -132,14 +132,14 @@ async def run_game(client, send_channel, req_channel_name):
             await stutterf('play text game')
             await stutterf('control station module')
             Laptop['Tutorial'] = 'Complete'
-            n()
+            await n()
         await stutter('You turn on the laptop.')
         Laptop['State'] = 'On'
         while Laptop['State'] == 'On':
-            n()
+            await n()
             task = await discord_input(client, req_channel_name)
             log(task)
-            n()
+            await n()
 
             if 'turn off' in task:
                 await stutter('You turn off the laptop.')
@@ -171,7 +171,7 @@ async def run_game(client, send_channel, req_channel_name):
                 contacts = ['nasa social media team']
                 await stutter('In your contacts list are: ')
                 for contact in contacts:
-                    stutterf(contact)
+                    await stutterf(contact)
 
                 await stutter('Who would you like to message?')
                 invalid_input = True
