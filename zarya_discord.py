@@ -13,7 +13,7 @@ __version__ = '5.x.x'
 
 
 # for recursion
-def run_game(channel):
+def run_game(client, channel):
     def n():
         discord_stutter('', channel=channel, skip=True)
 
@@ -137,7 +137,7 @@ def run_game(channel):
         Laptop['State'] = 'On'
         while Laptop['State'] == 'On':
             n()
-            task = discord_input()
+            task = discord_input(client, channel)
             log(task)
             n()
 
@@ -147,7 +147,7 @@ def run_game(channel):
 
             elif task == 'browse web':
                 stutter('A browser window opens. Where do you want to go?')
-                url = discord_input()
+                url = discord_input(client, channel)
                 log(url)
                 try:
                     response = urllib.request.urlopen(url)
@@ -176,14 +176,14 @@ def run_game(channel):
                 stutter('Who would you like to message?')
                 invalid_input = True
                 while invalid_input:
-                    contact = discord_input()
+                    contact = discord_input(client, channel)
                     log(contact)
                     if contact in contacts:
                         invalid_input = False
                         if contact == 'nasa social media team':
                             stutter('You can send pictures to NASA to be posted online.')
                             stutter('What picture would you like to send?')
-                            picture = discord_input()
+                            picture = discord_input(client, channel)
                             log(picture)
                             if 'picture' in picture:
                                 if picture in inventory:
@@ -211,7 +211,7 @@ def run_game(channel):
                 stutter('alignment: retrograde')
                 stutter("There is a button that says 'fire main engines'.")
                 stutter('Would you like to press it?')
-                choice = discord_input()
+                choice = discord_input(client, channel)
                 log(choice)
                 if 'yes' in choice:
                     stutter('You press the button and tons of Gs force you against the back of the module.')
@@ -222,7 +222,7 @@ def run_game(channel):
                             'when its unshielded mass burnt up violently in the atmosphere.')
                     stutters('GAME OVER')
                     Carry['On'] = False
-                    discord_input()
+                    discord_input(client, channel)
                     break
                 else:
                     stutter('That was probably a sensible choice.')
@@ -341,7 +341,7 @@ def run_game(channel):
         Player['Sleep'] += 1
         FicEpoch += 3600
         n()
-        Do = str.lower(discord_input())
+        Do = str.lower(discord_input(client, channel))
         log(Do)
         n()
 
@@ -512,11 +512,3 @@ def log_start():
     log('\n')
     log('hello world!')
     log(str(datetime.now()))
-
-
-if __name__ == '__main__':
-    # log new game
-    log_start()
-
-    # run
-    run_game()
