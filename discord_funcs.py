@@ -92,7 +92,7 @@ async def send_logs(channel, path='log.txt'):
 client = discord.ext.commands.bot.Bot(command_prefix=('>', '9v'))
 
 
-@client.event()
+@client.event
 async def on_ready():
     print('Bot running.')
 
