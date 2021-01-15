@@ -50,7 +50,7 @@ async def discord_stutter(text, channel, delay=lambda: random.randint(1, 3)/100,
             time.sleep(delay())
 
 
-def input_from_message(message, req_channel_name, prefixes=PREFIXES):
+def input_from_message(message, req_channel_name, prefixes=None):
     """Get input from a discord message.
 
     Args:
@@ -61,6 +61,9 @@ def input_from_message(message, req_channel_name, prefixes=PREFIXES):
         The message with the prefix removed. The return value will be an empty string if conditions were not met,
         which means this function can be used to check validity and to strip prefixes.
     """
+    if not prefixes:
+        prefixes = PREFIXES
+
     if not req_channel_name or message.channel.name == req_channel_name:
         for prefix in prefixes:
             if message.content.startswith(prefix):
