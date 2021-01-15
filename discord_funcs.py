@@ -15,6 +15,12 @@ import zarya_discord
 # https://discord.com/api/oauth2/authorize?client_id=799634237355065395&permissions=8&scope=bot
 
 
+PREFIXES = (
+    '>', '> ',
+    '9v', '9v ',
+)
+
+
 with open('settings.json', 'r') as settings_json:
     settings = json.load(settings_json)
 
@@ -44,7 +50,7 @@ async def discord_stutter(text, channel, delay=lambda: random.randint(1, 3)/100,
             time.sleep(delay())
 
 
-def input_from_message(message, req_channel_name, prefixes=None):
+def input_from_message(message, req_channel_name, prefixes=PREFIXES):
     """Get input from a discord message.
 
     Args:
@@ -55,9 +61,6 @@ def input_from_message(message, req_channel_name, prefixes=None):
         The message with the prefix removed. The return value will be an empty string if conditions were not met,
         which means this function can be used to check validity and to strip prefixes.
     """
-    if not prefixes:
-        prefixes = ['>', '9v']
-
     if not req_channel_name or message.channel.name == req_channel_name:
         for prefix in prefixes:
             if message.content.startswith(prefix):
@@ -89,7 +92,10 @@ async def send_logs(channel, path='log.txt'):
     await channel.send(file=discord.File(path))
 
 
-client = discord.ext.commands.bot.Bot(command_prefix=('>', '9v'))
+help_command = discord.ext.commands.DefaultHelpCommand(no_category="Commands (prefixes - '>', '9v')")
+
+
+client = discord.ext.commands.bot.Bot(command_prefix=PREFIXES, help_command=help_command)
 
 
 @client.event
