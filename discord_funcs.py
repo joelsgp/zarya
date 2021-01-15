@@ -4,14 +4,6 @@ import random
 import discord
 
 
-def input_from_message(message, prefixes):
-    for prefix in prefixes:
-        if message.content.startswith(prefix):
-            return message.content.removeprefix(prefix).strip()
-
-    return ''
-
-
 async def stutter(text, channel, delay=lambda: random.randint(1, 3)/100, skip=False):
     if skip:
         await channel.send(text)
@@ -20,3 +12,23 @@ async def stutter(text, channel, delay=lambda: random.randint(1, 3)/100, skip=Fa
         for i in range(1, len(text)):
             await message.edit(text[:i])
             time.sleep(delay())
+
+
+def input_from_message(message, channel, prefixes=None):
+    if not prefixes:
+        prefixes = ['>', '9v']
+
+    if message.channel == channel:
+        for prefix in prefixes:
+            if message.content.startswith(prefix):
+                return message.content.removeprefix(prefix).strip()
+
+    return ''
+
+
+async def discord_input(client, channel, prefixes=None):
+    while True:
+        new_message = await client.wait_for('message')
+        check = input_from_message(new_message, channel, prefixes)
+        if check:
+            return check
