@@ -79,7 +79,7 @@ async def discord_input(client, channel, prefixes=None):
 
 async def send_logs(channel, path='log.txt'):
     """Send logs to a discord channel."""
-    await channel.send(discord.File(path))
+    await channel.send(file=discord.File(path))
 
 
 client = discord.ext.commands.bot.Bot(command_prefix=('>', '9v'))
