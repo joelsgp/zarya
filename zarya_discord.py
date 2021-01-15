@@ -347,7 +347,7 @@ async def run_game(client, send_channel, req_channel_name):
     FicEpoch = 968716800
     await stutterf(f'Zarya-Discord v{__version__}')
     await stutterf('© Joel McBride 2017, 2021')
-    await stutterf("Remember to report any bugs or errors to 'joel.mcbride1@live.com'.")
+    await stutterf("Remember to report any bugs or errors to 'JMcB#7918' - @ or DM me.")
     await n()
     await stutter('Date: ' + datetime.fromtimestamp(FicEpoch).strftime('%d.%m.%Y'))
     await stutter("For a list of commands, type 'help'.")
@@ -367,7 +367,18 @@ async def run_game(client, send_channel, req_channel_name):
                 await stutterf(help_info_item)
             await stutter('For the uninitiated: ')
             await stutter('In text-based adventure games, a good first command when '
-                    "starting out or \nentering a new place is 'look around'.")
+                          "starting out or \nentering a new place is 'look around'.")
+
+        elif Do in ['info', 'i', 'background', 'b']:
+            await stutterf(f'Zarya-Discord v{__version__}')
+            await stutterf('© Joel McBride 2017, 2021')
+            await stutterf("Remember to report any bugs or errors to 'JMcB#7918' - @ or DM me.")
+            await stutter('I made this game as one of my first reasonably large projects about four years ago '
+                          '(2016). It was very poorly coded but I worked quite a while on it, although after I '
+                          "finished most of the framework stuff I couldn't be bothered to add much more content. "
+                          "The writing, what there is, is ok, it's got some funny bits I guess. "
+                          'Anyway, I had the idea recently (2021) to make a text based adventure game for Discord, '
+                          'so I went back to my old project, touched the code up a bit, ported it, and here we are.')
 
         elif Do in ['quit', 'q']:
             break
