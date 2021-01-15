@@ -1,7 +1,13 @@
-import random
 import time
-from urllib import request
+import random
+import urllib.request
+import urllib.error
+
 from datetime import datetime
+from tkinter import *
+
+
+__version__ = '4.0.5'
 
 
 # for recursion
@@ -37,35 +43,36 @@ def run_game():
     inventory = dict()
 
     # list of commands for help
-    Help = list()
-    Functions = list()
-    Help.append('help -Shows a list of commands')
-    Help.append('skip -Toggles stuttering off')
-    Help.append('noskip -Toggles stuttering on')
-    Help.append('look around -Tells you what is in the room')
-    Help.append('show inventory -Tells you what is in your inventory')
-    Help.append('search [object] -Tells you what is in a container')
-    Help.append('take [item] -Puts an item in your inventory')
-    Help.append('take all -Puts all available items in your inventory')
-    Help.append('use [item] -Lets you excersise the funtionality of an item')
-    Help.append('leave [place] -Lets you leave where you are')
-    Help.append('go through [direction] port -Travel into adjacent modules')
-    Help.append('drop [item] -Removes an item from your inventory')
-    Help.append('quit -Ends the game')
-    Help.append('Note:')
-    Help.append('You can also use abbrevitations for some commands.')
+    help_info = [
+        'help -Shows a list of commands',
+        'skip -Toggles stuttering off',
+        'noskip -Toggles stuttering on',
+        'look around -Tells you what is in the room',
+        'show inventory -Tells you what is in your inventory',
+        'search [object] -Tells you what is in a container',
+        'take [item] -Puts an item in your inventory',
+        'take all -Puts all available items in your inventory',
+        'use [item] -Lets you exercise the functionality of an item',
+        'leave [place] -Lets you leave where you are',
+        'go through [direction] port -Travel into adjacent modules',
+        'drop [item] -Removes an item from your inventory',
+        'quit -Ends the game',
+        'Note:',
+        'You can also use abbreviations for some commands.',
+    ]
+
+    functions = list()
 
     # npc interact subroutines
     def talktocrewmate():
-        stutter('Hello there! Glad to see you got that malfunctioning hatch '\
-                'open.')
+        stutter('Hello there! Glad to see you got that malfunctioning hatch open.')
     
     # item use subroutines
     def usepaper():
         stutter('The strip of paper has a password on it.')
-        stutter('\'Pa$$word123\'')
+        stutter("'Pa$$word123'")
         stutter('You wonder what it is the password to.')
-        stutter('(That\'s your cue to wonder what it is the password to)')
+        stutter("(That's your cue to wonder what it is the password to)")
 
     def usedrive():
         if 'laptop' in inventory or 'laptop' in Room['Items']:
@@ -81,8 +88,7 @@ def run_game():
     def usejumpsuit():
         stutter('You put on the jumpsuit.')
         Player['Wearing'] = 'RussianJumpsuit'
-        stutter('You were already wearing one, however, ' \
-                'so you are now wearing two jumpsuits.')
+        stutter('You were already wearing one, however, so you are now wearing two jumpsuits.')
         stutter('Good job.')
 
     def usegreenhouse():
@@ -91,27 +97,27 @@ def run_game():
 
     def usecamera():
         if 'Windows' in Room:
-            stutterl('You take the camera to a window and, after fiddling with ' \
-                    'lenses and settings for\na few minutes, take a ')
-            PictureQuality = random.randint(1, 10)
-            if PictureQuality <= 2:
-                PictureType = 'rubbish'
-            elif PictureQuality <= 5:
-                PictureType = 'nice'
+            stutterl('You take the camera to a window and, after fiddling with '
+                     'lenses and settings for\na few minutes, take a ')
+            picture_quality = random.randint(1, 10)
+            if picture_quality <= 2:
+                picture_type = 'rubbish'
+            elif picture_quality <= 5:
+                picture_type = 'nice'
             else:
-                PictureType = 'beautiful'
-            Name = str(PictureType + ' picture')
-            stutter(Name + '.')
-            inventory[Name] = PictureQuality
+                picture_type = 'beautiful'
+            picture_name = f'{picture_type} picture'
+            stutter(f'{picture_name}.')
+            inventory[picture_name] = picture_quality
         else:
             stutter('There are no windows to take pictures out of in this module.')
 
     def usetoilet():
-        stutter('You do your business in the space toilet. Don\'t ask an astronaut ' \
-                'how this \nhappens if you meet one, they\'re tired of the question.')
+        stutter("You do your business in the space toilet. Don't ask an astronaut "
+                "how this \nhappens if you meet one, they're tired of the question.")
 
     def usebed():
-        stutter('You get in the \'bed\'.')
+        stutter("You get in the 'bed'.")
         if Player['Sleep'] > 8:
             stutter('You sleep until you are no longer tired.')
             nonlocal FicEpoch
@@ -135,64 +141,66 @@ def run_game():
         Laptop['State'] = 'On'
         while Laptop['State'] == 'On':
             n()
-            Task = input()
-            log(Task)
+            task = input()
+            log(task)
             n()
-            if 'turn off' in Task:
+
+            if 'turn off' in task:
                 stutter('You turn off the laptop.')
                 Laptop['State'] = 'Off'
-            elif Task == 'browse web':
+            elif task == 'browse web':
                 stutter('A browser window opens. Where do you want to go?')
-                URL = input()
-                log(URL)
+                url = input()
+                log(url)
                 try:
-                    response = request.urlopen(URL)
+                    response = urllib.request.urlopen(url)
                     html = response.read()
                     print(html)
-                    stutter('Hmm, looks like there\'s no GUI.')
+                    stutter("Hmm, looks like there's no GUI.")
                     stutter('Oh well.')
                 except ValueError as err:
                     stutter('That\'s not a valid URL.')
                 except urllib.error.URLError as err:
                     stutter('You have no internet connection.')
-            elif Task == 'read files':
+            elif task == 'read files':
                 if Laptop['Files'] == 'None':
                     stutter('You have no files to read!')
                 else:
                     stutter('The files say: ')
                     stutter(Laptop['Files'])
-            elif Task == 'use messenger app':
-                Contacts = ['nasa social media team']
+            elif task == 'use messenger app':
+                contacts = ['nasa social media team']
                 stutter('In your contacts list are: ')
-                for i in range (len(Contacts)):
-                    stutterf(Contacts[i])
+                for contact in contacts:
+                    stutterf(contact)
+
                 stutter('Who would you like to message?')
-                NotRight = True
-                while NotRight == True:
-                    Contact = input()
-                    log(Contact)
-                    if Contact in Contacts:
-                        NotRight = False
-                        if Contact == 'nasa social media team':
+                invalid_input = True
+                while invalid_input:
+                    contact = input()
+                    log(contact)
+                    if contact in contacts:
+                        invalid_input = False
+                        if contact == 'nasa social media team':
                             stutter('You can send pictures to NASA to be posted online.')
                             stutter('What picture would you like to send?')
-                            Picture = input()
-                            log(Picture)
-                            if 'picture' in Picture:
-                                if Picture in inventory:
+                            picture = input()
+                            log(picture)
+                            if 'picture' in picture:
+                                if picture in inventory:
                                     stutter('You send the picture.')
-                                    Likes = inventory[Picture] * random.randint(10, 1000)
-                                    stutter('Your picture gets ' + str(Likes) + ' likes.')
-                                    del inventory[Picture]
+                                    likes = inventory[picture] * random.randint(10, 1000)
+                                    stutter('Your picture gets ' + str(likes) + ' likes.')
+                                    del inventory[picture]
                                 else:
-                                    stutter('You don\'t have that picture.')
+                                    stutter("You don't have that picture.")
                             else:
-                                stutter('That\'s not a picture!')
+                                stutter("That's not a picture!")
                     else:
-                        stutter('They aren\'t in your contacts list.')
-            elif Task == 'play text game':
+                        stutter("They aren't in your contacts list.")
+            elif task == 'play text game':
                 run_game()
-            elif Task == 'control station module':
+            elif task == 'control station module':
                 stutter('A window opens with a few readouts and options.')
                 stutter('periapsis: 390km')
                 stutter('apoapsis: 390km')
@@ -200,25 +208,25 @@ def run_game():
                 stutter('orbital period: 93 minutes')
                 stutter('thruster statuses: nominal')
                 stutter('alignment: retrograde')
-                stutter('There is a button that says \'fire main engines\'.')
+                stutter("There is a button that says 'fire main engines'.")
                 stutter('Would you like to press it?')
-                Choice = input()
-                log(Choice)
-                if 'yes' in Choice:
+                choice = input()
+                log(choice)
+                if 'yes' in choice:
                     stutter('You press the button and tons of Gs force you against the back of the module.')
-                    stutter('This is a cargo module, which means there\'s no seat to help you.')
+                    stutter("This is a cargo module, which means there's no seat to help you.")
                     stutter('Your orbit is rapidly falling deeper into the atmosphere.')
                     stutter('The remains of the module hits the ground at terminal velocity.')
-                    stutter('But it\'s ok, because you were already obliterated '\
-                            'when its unsheilded mass burntup violently in the atmosphere.')
+                    stutter("But it's ok, because you were already obliterated "
+                            'when its unshielded mass burnt up violently in the atmosphere.')
                     stutters('GAME OVER')
                     Carry['On'] = False
-                    Delay = input()
+                    input()
                     break
                 else:
                     stutter('That was probably a sensible choice.')
             else:
-                stutter('The laptop can\'t do that!')
+                stutter("The laptop can't do that!")
 
     # items
     Laptop = {'Name': 'Laptop', 'Desc': ' a laptop on the wall.',
@@ -230,22 +238,20 @@ def run_game():
     Drive = {'Name': 'Drive', 'Desc': ' a usb stick.',
              'Usable': 'Yes', 'Takeable': 'Yes',
              'Files': '\'print(\'hello world!\')\''}
-    Jumpsuit = {'Name': 'Jumpsuit', 'Desc': ' a blue jumpsuit with the flag '\
-                'of THE GLORIOUS SOVIET UNION I mean, Russia, on it.',
+    Jumpsuit = {'Name': 'Jumpsuit',
+                'Desc': ' a blue jumpsuit with the flag of THE GLORIOUS SOVIET UNION I mean, Russia, on it.',
                 'Usable': 'Yes', 'Takeable': 'Yes'}
 
-    Greenhouse = {'Name': 'Lada', 'Desc': ' a little greenhouse thing ' \
-                  'with sprouts growing in it.',
+    Greenhouse = {'Name': 'Lada',
+                  'Desc': ' a little greenhouse thing with sprouts growing in it.',
                   'Usable': 'Yes'}
-    Camera = {'Name': 'Camera', 'Desc': ' a dslr camera and a few lenses ' \
-              'on the wall.',
+    Camera = {'Name': 'Camera', 'Desc': ' a DSLR camera and a few lenses on the wall.',
               'Usable': 'Yes', 'Takeable': 'Yes'}
-    Toilet = {'Name': 'Space Toilet', 'Desc': ' a bogstandard space toilet ' \
-              'in a little cubicle. Pun intended.',
+    Toilet = {'Name': 'Space Toilet', 'Desc': ' a bogstandard space toilet in a little cubicle. Pun intended.',
               'Usable': 'Yes'}
-    Bed = {'Name': 'Sleeping Bag', 'Desc': ' a simple sleeping bag strapped ' \
-              'securely to a wall.',
-              'Usable': 'Yes'}
+    Bed = {'Name': 'Sleeping Bag',
+           'Desc': ' a simple sleeping bag strapped securely to a wall.',
+           'Usable': 'Yes'}
 
     # objects
     ContainersItems = {'paper': Paper, 'drive': Drive, 'jumpsuit': Jumpsuit}
@@ -258,37 +264,46 @@ def run_game():
     ZaryaNear = {'front': 'Unity', 'aft': 'Zvezda'}
     ZaryaItems = {'laptop': Laptop}
     ZaryaObjects = {'containers': Containers}
-    Zarya = {'Name': 'Zarya', 'Leavable': 0,
-             'Ports': ZaryaPorts, 'Near': ZaryaNear,
-             'Items': ZaryaItems, 'Objects': ZaryaObjects,
-             'Desc': 'in a bland white module, what may ' \
-             'sometimes be considered the walls \nlined with storage ' \
-             'containers.'}
+    Zarya = {
+        'Name': 'Zarya', 'Leavable': 0,
+        'Ports': ZaryaPorts, 'Near': ZaryaNear,
+        'Items': ZaryaItems, 'Objects': ZaryaObjects,
+        'Desc': 'in a bland white module, what may sometimes be considered the walls \nlined with storage ' 
+                'containers.'
+    }
 
-    UnityPorts = {'front': 'closed', 'nadir': 'closed',
-                  'port': 'closed', 'zenith': 'closed',
-                  'starboard': 'closed', 'aft': 'open'}
+    UnityPorts = {
+        'front': 'closed', 'nadir': 'closed',
+        'port': 'closed', 'zenith': 'closed',
+        'starboard': 'closed', 'aft': 'open'
+    }
     UnityNear = {'aft': 'Zarya'}
     UnityItems = dict()
     UnityObjects = dict()
-    Unity = {'Name': 'Unity', 'Leavable': 0,
-             'Ports': UnityPorts, 'Near': UnityNear,
-             'Items': UnityItems, 'Objects': UnityObjects,
-             'Desc': 'in one of the nodes that links part of the station. '}
+    Unity = {
+        'Name': 'Unity', 'Leavable': 0,
+        'Ports': UnityPorts, 'Near': UnityNear,
+        'Items': UnityItems, 'Objects': UnityObjects,
+        'Desc': 'in one of the nodes that links part of the station. '
+    }
 
-    ZvezdaPorts = {'front': 'open', 'nadir': 'closed',
-                   'zenith': 'closed', 'aft': 'closed'}
+    ZvezdaPorts = {
+        'front': 'open', 'nadir': 'closed',
+        'zenith': 'closed', 'aft': 'closed'
+    }
     ZvezdaNear = {'front': 'Zarya'}
     ZvezdaItems = {'greenhouse': Greenhouse, 'camera': Camera, 'toilet': Toilet,
                    'bed': Bed}
     ZvezdaObjects = dict()
-    Zvezda = {'Name': 'Zvezda', 'Leavable': 0, 'Windows': 'Yes',
-             'Ports': ZvezdaPorts, 'Near': ZvezdaNear,
-             'Items': ZvezdaItems, 'Objects': ZvezdaObjects,
-             'Desc': 'in a three-part service module, with a spherical \'Transfer ' \
-              'Compartment\' to the front, a \'Work Compartment\' with living ' \
-              'quarters and life support, where things are done, and to aft a ' \
-              '\'Transfer Chamber\'.'}
+    Zvezda = {
+        'Name': 'Zvezda', 'Leavable': 0, 'Windows': 'Yes',
+        'Ports': ZvezdaPorts, 'Near': ZvezdaNear,
+        'Items': ZvezdaItems, 'Objects': ZvezdaObjects,
+        'Desc': "in a three-part service module, with a spherical 'Transfer "
+                "Compartment' to the front, a 'Work Compartment' with living "
+                'quarters and life support, where things are done, and to aft a '
+                "'Transfer Chamber'."
+    }
 
     # player
     Player = {'Name': 'Player', 'Wearing': 'Jumpsuit',
@@ -297,18 +312,21 @@ def run_game():
     def helpwindow():
         helpw = Tk()
         helpw.title('help')
-        helpc = Canvas(helpw, height = (len(Help)*20)+20, width = 650)
+        helpc = Canvas(helpw, height=(len(help_info)*20)+20, width=650)
         helpc.pack()
-        Text = list()
-        for i in range (len(Help)):
-            Text.append(helpc.create_text(325, (i*20)+20, text=Help[i]))
+        text = list()
+        for help_info_item in help_info:
+            text.append(helpc.create_text(325, (i*20)+20, text=help_info_item))
 
-    Months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
+    Months = [
+        'January', 'February', 'March', 'April', 'May', 'June',
+        'July', 'August', 'September', 'October', 'November', 'December'
+    ]
 
     # start game
     Room = Zarya
     FicEpoch = 968716800
-    stutterf('Zarya v4.05')
+    stutterf(f'Zarya v{__version__}')
     stutterf('© Joel McBride 2017')
     stutterf('Remember to report any bugs or errors to \'jmcbri14@st-pauls.leicester.sch.uk.\'')
     n()
@@ -316,7 +334,7 @@ def run_game():
     stutter('For a list of commands, type \'help\'.')
     # command reader
     Carry = {'On': True}
-    while Carry['On'] == True:
+    while Carry['On']:
         Player['Sleep'] += 1
         FicEpoch += 3600
         n()
@@ -324,8 +342,8 @@ def run_game():
         log(Do)
         n()
         if Do == 'help' or Do == 'h':
-            for i in range (len(Help)):
-                stutterf(Help[i])
+            for help_info_item in help_info:
+                stutterf(help_info_item)
             stutter('For the uninitiated: ')
             stutter('In text-based adventure games, a good first command when ' \
                     'starting out or \nentering a new place is \'look around\'.')
@@ -336,9 +354,8 @@ def run_game():
             Items = Room['Items']
             if len(Items) > 0:
                 ItemVars = list(Items.values())
-                for i in range (len(Items)):
-                    Item = ItemVars[i]
-                    stutter('There is' + Item['Desc'])
+                for item in Items:
+                    stutter(f"There is{item['Desc']}")
             if 'Ports' in Room:
                 stutter('There are ' + str(len(Room['Ports'])) + ' ports: ')
                 Ports = Room['Ports']
@@ -350,10 +367,10 @@ def run_game():
             if len(inventory) == 0:
                 stutter('Your inventory is empty.')
             else:
-                YouHave = list(inventory)
+                you_have = list(inventory)
                 stutter('In your inventory is: ')
-                for i in range (len(inventory)):
-                    stutter(YouHave[i])
+                for inventory_item in inventory:
+                    stutter(you_have[inventory_item])
         elif 'search' in Do:
             Object = Do[7:]
             if Object in Room['Objects']:
@@ -429,9 +446,9 @@ def run_game():
                     inventory[Item] = Details
                     del Items[Item]
                 else:
-                    stutter('You can\'t take that.')
+                    stutter("You can't take that.")
             else:
-                stutter('That item isn\'t here.')
+                stutter("That item isn't here.")
         elif 'use' in Do:
             Item = Do[4:]
             if Item in inventory or Item in Room['Items']:
@@ -440,9 +457,9 @@ def run_game():
                     SubCall = 'use' + str(Item) + '()'
                     eval(SubCall)
                 else:
-                    stutter('That item isn\'t usable.')
+                    stutter("That item isn't usable.")
             else:
-                stutter('You don\'t have that item.')
+                stutter("You don't have that item.")
         elif 'drop' in Do:
             Item = Do[5:]
             if Item in inventory:
@@ -452,7 +469,7 @@ def run_game():
                 Items[Item] = Details
                 del inventory[Item]
             else:
-                stutter('That item isn\'t in your inventory.')
+                stutter("That item isn't in your inventory.")
         elif Do == 'skip' or Do == 's':
             skip = True
             stutter('Text will now output instantly.')
@@ -460,7 +477,7 @@ def run_game():
             skip = False
             stutter('Text will now output gradually.')
         else:
-            stutter('That\'s not a valid command.')
+            stutter("That's not a valid command.")
 
 
 # logging
