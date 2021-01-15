@@ -7,7 +7,7 @@ from datetime import datetime
 # from tkinter import *
 
 
-__version__ = '4.0.5'
+__version__ = '5.x.x'
 
 
 # for recursion
@@ -148,6 +148,7 @@ def run_game():
             if 'turn off' in task:
                 stutter('You turn off the laptop.')
                 Laptop['State'] = 'Off'
+
             elif task == 'browse web':
                 stutter('A browser window opens. Where do you want to go?')
                 url = input()
@@ -162,12 +163,14 @@ def run_game():
                     stutter("That's not a valid URL.")
                 except urllib.error.URLError:
                     stutter('You have no internet connection.')
+
             elif task == 'read files':
                 if Laptop['Files'] == 'None':
                     stutter('You have no files to read!')
                 else:
                     stutter('The files say: ')
                     stutter(Laptop['Files'])
+
             elif task == 'use messenger app':
                 contacts = ['nasa social media team']
                 stutter('In your contacts list are: ')
@@ -198,8 +201,10 @@ def run_game():
                                 stutter("That's not a picture!")
                     else:
                         stutter("They aren't in your contacts list.")
+
             elif task == 'play text game':
                 run_game()
+
             elif task == 'control station module':
                 stutter('A window opens with a few readouts and options.')
                 stutter('periapsis: 390km')
@@ -225,6 +230,7 @@ def run_game():
                     break
                 else:
                     stutter('That was probably a sensible choice.')
+
             else:
                 stutter("The laptop can't do that!")
 
@@ -327,11 +333,12 @@ def run_game():
     Room = Zarya
     FicEpoch = 968716800
     stutterf(f'Zarya v{__version__}')
-    stutterf('© Joel McBride 2017')
-    stutterf('Remember to report any bugs or errors to \'jmcbri14@st-pauls.leicester.sch.uk.\'')
+    stutterf('© Joel McBride 2017, 2021')
+    stutterf("Remember to report any bugs or errors to 'joel.mcbride1@live.com'.")
     n()
     stutter('Date: ' + datetime.fromtimestamp(FicEpoch).strftime('%d.%m.%Y'))
-    stutter('For a list of commands, type \'help\'.')
+    stutter("For a list of commands, type 'help'.")
+
     # command reader
     Carry = {'On': True}
     while Carry['On']:
@@ -341,21 +348,24 @@ def run_game():
         Do = str.lower(input())
         log(Do)
         n()
+
         if Do in ['help', 'h']:
             for help_info_item in help_info:
                 stutterf(help_info_item)
             stutter('For the uninitiated: ')
             stutter('In text-based adventure games, a good first command when '
                     "starting out or \nentering a new place is 'look around'.")
-        elif Do == 'quit' or Do == 'q':
+
+        elif Do in ['quit', 'q']:
             break
+
         elif Do in ['look around', 'look', 'la', 'l']:
             stutter('You are ' + Room['Desc'] + ' ')
             Items = Room['Items']
             if len(Items) > 0:
                 ItemVars = list(Items.values())
-                for item in Items:
-                    stutter(f"There is{item['Desc']}")
+                for i, value in enumerate(Items):
+                    stutter(f"There is{ItemVars[i]['Desc']}")
             if 'Ports' in Room:
                 stutter('There are ' + str(len(Room['Ports'])) + ' ports: ')
                 Ports = Room['Ports']
@@ -363,6 +373,7 @@ def run_game():
                 PortStates = list(Ports.values())
                 for i, value in enumerate(Room['Ports']):
                     stutter(f'One to {PortTypes[i]} that is {PortStates[i]}.')
+
         elif Do in ['show inventory', 'inventory', 'si', 'i']:
             if not inventory:
                 stutter('Your inventory is empty.')
@@ -371,6 +382,7 @@ def run_game():
                 stutter('In your inventory is: ')
                 for inventory_item in inventory:
                     stutter(you_have[inventory_item])
+
         elif 'search' in Do:
             Object = Do[7:]
             if Object in Room['Objects']:
@@ -387,12 +399,14 @@ def run_game():
                     stutter("There isn't anything here.")
             else:
                 stutter("That isn't in here.")
+
         elif 'leave' in Do:
             if Room['Leavable'] == 1:
                 stutter('You leave the ' + str.lower(Room['Name']) + '.')
                 Room = PrevRoom
             else:
                 stutter('I\'m sorry ' + Player['Name'] + ', you can\'t do that.')
+
         elif 'go through' in Do or 'gt' in Do or 'go' in Do:
             if 'go through' in Do and 'port' in Do:
                 SubStringEnd = Do.index('port')
@@ -417,6 +431,7 @@ def run_game():
                     stutter('That port is closed.')
             else:
                 stutter("The module you're in doesn't have a port there.")
+
         elif Do in ['take all', 'ta']:
             ItemsList = list(Room['Items'])
             if len(ItemsList) > 0:
@@ -435,6 +450,7 @@ def run_game():
                         stutter(f"You can't take the {Item}.")
             else:
                 stutter("There's nothing here.")
+
         elif 'take' in Do:
             Item = Do[5:]
             Items = Room['Items']
@@ -449,6 +465,7 @@ def run_game():
                     stutter("You can't take that.")
             else:
                 stutter("That item isn't here.")
+
         elif 'use' in Do:
             Item = Do[4:]
             if Item in inventory or Item in Room['Items']:
@@ -460,6 +477,7 @@ def run_game():
                     stutter("That item isn't usable.")
             else:
                 stutter("You don't have that item.")
+
         elif 'drop' in Do:
             Item = Do[5:]
             if Item in inventory:
@@ -470,12 +488,15 @@ def run_game():
                 del inventory[Item]
             else:
                 stutter("That item isn't in your inventory.")
-        elif Do == 'skip' or Do == 's':
+
+        elif Do in ['skip', 's']:
             skip = True
             stutter('Text will now output instantly.')
-        elif Do == 'noskip' or Do == 'n' or Do == 'ns':
+
+        elif Do in ['noskip', 'ns', 'n']:
             skip = False
             stutter('Text will now output gradually.')
+
         else:
             stutter("That's not a valid command.")
 
