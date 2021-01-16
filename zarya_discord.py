@@ -2,6 +2,7 @@ import random
 import urllib.request
 import urllib.error
 
+from typing import List, Dict, Callable
 from datetime import datetime
 # from tkinter import *
 
@@ -12,6 +13,112 @@ __version__ = '0.1.0'
 
 
 # TODO: more comprehensive refactor, oop etc.
+
+
+class ZaryaItem:
+    """Class for items.
+
+    An item has a name and can be inspected for a description. It may be used, which will invoke usefunc, or taken.
+
+    Attrs:
+        name
+        desc -- description of item
+        can_use
+        can_take
+        usefunc -- function to be run when the item is used
+    """
+    desc_stem = 'There is '
+
+    def __init__(self, name: str, desc: str, can_use: bool = False, can_take: bool = False, usefunc: Callable = None):
+        self.name = name
+        if desc.startswith(self.desc_stem):
+            desc = desc.removeprefix(self.desc_stem)
+        self.desc = desc.strip()
+        self.can_use = can_use
+        self.can_take = can_take
+        if self.can_use and usefunc is not None:
+            self.usefunc = usefunc
+
+
+class ZaryaContainer:
+    """Class for containers.
+
+    A container has a name, and a description which will be used when you `look` while inside it.
+    It may be entered and exited, and contain items.
+
+    Attrs:
+        name
+        desc -- look message of container
+        can_leave -- whether you can leave the container, used in the ZaryaRoom subclass
+        items -- items in the container, a list of ZaryaItems or None
+    """
+
+    desc_stem = 'You are '
+
+    def __init__(self, name: str, desc: str, can_leave: bool = True, items: List[ZaryaItem] = None):
+        self.name = name
+        if desc.startswith(self.desc_stem):
+            desc = desc.removeprefix(self.desc_stem)
+        self.desc = desc.strip()
+        self.can_leave = can_leave
+        self.items = items
+
+
+class ZaryaPort:
+    """Class for ports connecting two modules of the station (rooms).
+
+    A port has a name, which should correspond to a direction in orbit, like the ones used to describe ISS ports.
+    A port will be open or closed. If open, it may have a room which you will enter by going through it.
+
+    Attrs:
+        name
+        port_open
+        room -- if applicable, the ZaryaRoom which you will enter by going through the port
+    """
+    def __init__(self, name: str, port_open: bool, room=None):
+        self.name = name
+        self.port_open = port_open
+        if self.port_open and room is not None:
+            self.room = room
+
+
+class ZaryaRoom(ZaryaContainer):
+    """Class for rooms I.E. station modules.
+
+    A room has all of a container's attributes. It may also have containers within it, and ports connecting it
+    to other rooms.
+
+    Attrs:
+        desc -- look message of room
+        can_leave -- whether you can leave the room, should be False
+        items -- items in the room, a list of ZaryaItems or None
+        containers -- a list of ZaryaContainers which you can enter, or None
+        ports -- a list of ZaryaPorts which may be open or closed, or None
+    """
+    def __init__(self, name: str, desc: str, can_leave: bool = False, items: List[ZaryaItem] = None,
+                 containers: List[ZaryaContainer] = None, ports: List[ZaryaPort] = None):
+        super().__init__(name, desc, can_leave, items)
+
+        self.containers = containers
+        self.ports = ports
+
+
+class ZaryaPlayer:
+    """Class for the player character.
+
+    Attrs:
+        name
+        inventory --  a list of ZaryaItem's
+        wearing -- outfit
+        sleep -- how much sleep as a float
+    """
+    name = 'Player'
+
+    def __init__(self, name: str, inventory: List[ZaryaItem], wearing, sleep: float = 5):
+        self.name = name
+        self.inventory = inventory
+        self.wearing = wearing
+        self.sleep = sleep
 
 
 # for recursion
