@@ -95,11 +95,6 @@ async def discord_input(discord_client, req_channel_name, prefixes=None):
             return check
 
 
-async def send_logs(channel, path='log.txt'):
-    """Send logs to a discord channel."""
-    await channel.send(file=discord.File(path))
-
-
 help_command = discord.ext.commands.DefaultHelpCommand(no_category="Commands (prefixes - '>', '9v')")
 
 
@@ -113,7 +108,12 @@ async def on_ready():
 
 @client.command(aliases=['log', 'log.txt'])
 async def logs(ctx):
-    await send_logs(ctx.channel)
+    try:
+        file = discord.File('log.txt')
+    except FileNotFoundError:
+        await ctx.channel.send('No logs.')
+    else:
+        await ctx.channel.send(file=file)
 
 
 @client.command()
