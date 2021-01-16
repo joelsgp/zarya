@@ -1,0 +1,91 @@
+{
+  "discord": {
+
+  },
+
+  "game": {
+    "items": {
+      "desc_stem": "There is",
+
+      "laptop": {
+        "name": "Laptop",
+        "desc": "a laptop on the wall"
+      },
+
+      "paper": {
+        "name": "Paper",
+        "desc": "a strip of paper"
+      },
+
+      "drive": {
+        "name": "Drive",
+        "desc": "a USB stick"
+      },
+
+      "jumpsuit": {
+        "name": "Jumpsuit",
+        "desc": "a blue jumpsuit with the flag of the glorious soviet union, I mean, Russia, on it"
+      },
+
+      "greenhouse": {
+        "name": "Lada",
+        "proper_name": "Lada",
+        "desc": "a little greenhouse thing with sprouts growing in it"
+      },
+
+      "camera": {
+        "name": "Camera",
+        "desc": "a laptop on the wall"
+      },
+
+      "toilet": {
+        "name": "Space Toilet",
+        "desc": "a bogstandard space toilet in a little cubicle. Pun intended"
+      },
+
+      "bed": {
+        "name": "Sleeping Bag",
+        "desc": "a simple sleeping bag strapped securely to a wall"
+      }
+    },
+
+    "containers": {
+      "desc_stem": "You are",
+
+      "zarya_boxes": {
+        "name": "Containers",
+        "desc": "looking in the containers lining the walls"
+      }
+    },
+
+    "rooms": {
+      "desc_stem": "You are",
+
+      "zarya": {
+        "name": "Zarya",
+        "proper_name": "Zarya",
+        "desc": "in a bland white module, what may sometimes be considered the walls lined with storage containers"
+      },
+
+      "unity": {
+        "name": "Unity",
+        "proper_name": "Unity",
+        "desc": "in one of the nodes that links part of the station"
+      },
+
+      "Zvezda": {
+        "name": "Zvezda",
+        "proper_name": "Zvezda",
+        "desc": "in a three-part service module, with a spherical 'Transfer Compartment' to the front, a 'Work Compartment' with living quarters and life support, where things are done, and to aft a 'Transfer Chamber'"
+      }
+    },
+
+    "player": {
+      "name": "Player"
+    },
+
+    "actions": {
+      "startup": "Zarya-Discord v{version}\n© Joel McBride 2017, 2021\nRemember to report any bugs or errors to 'JMcB#7918' - @ or DM me.\nDate: {date}\nFor a list of commands, type 'help'."
+    }
+  }
+}
