@@ -8,6 +8,11 @@ import discord.ext.commands
 import zarya_discord
 
 
+# TODO: improved framework, compatibility with builtin print and input, more features, etc.
+# TODO: create strings file, csv parser for translations, lang setting in settings
+# TODO: add func to change persistent settings
+
+
 # Add links:
 # Send Messages; Attach Files:
 # https://discord.com/api/oauth2/authorize?client_id=799634237355065395&permissions=34816&scope=bot

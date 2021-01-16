@@ -11,6 +11,9 @@ from discord_funcs import discord_input, discord_stutter
 __version__ = '0.1.0'
 
 
+# TODO: more comprehensive refactor, oop etc.
+
+
 # for recursion
 async def run_game(client, send_channel, req_channel_name):
     async def n():
@@ -379,7 +382,7 @@ async def run_game(client, send_channel, req_channel_name):
             await stutter('In text-based adventure games, a good first command when '
                           "starting out or \nentering a new place is 'look around'.")
 
-        elif Do in ['info', 'i', 'background', 'b']:
+        elif Do in ['info', 'background', 'b']:
             await stutterf(f'Zarya-Discord v{__version__}')
             await stutterf('© Joel McBride 2017, 2021')
             await stutterf("Remember to report any bugs or errors to 'JMcB#7918' - @ or DM me.")
@@ -418,10 +421,9 @@ async def run_game(client, send_channel, req_channel_name):
             if not inventory:
                 await stutter('Your inventory is empty.')
             else:
-                you_have = list(inventory)
                 await stutter('In your inventory is: ')
-                for inventory_item in inventory:
-                    await stutter(you_have[inventory_item])
+                for inventory_item in inventory.keys():
+                    await stutter(inventory_item)
 
         elif 'search' in Do:
             Object = Do[7:]
@@ -496,7 +498,7 @@ async def run_game(client, send_channel, req_channel_name):
             Items = Room['Items']
             Details = Items[Item]
             if Item in Items:
-                TrueItem = str.upper(Item[0]) + Item[1:]
+                TrueItem = Item.title()
                 if 'Takeable' in eval(TrueItem):
                     await stutter('You take the ' + Item + '.')
                     inventory[Item] = Details
