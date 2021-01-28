@@ -4,7 +4,7 @@ import json
 import urllib.request
 import urllib.error
 
-from typing import List, Dict, Callable
+from typing import List, Callable
 from datetime import datetime
 # from tkinter import *
 
@@ -176,6 +176,7 @@ class ZaryaGame:
             'help -Shows a list of commands',
             'skip -Toggles stuttering off',
             'noskip -Toggles stuttering on',
+            'setname -Changes your name. Legally binding',
             'look around -Tells you what is in the room',
             'show inventory -Tells you what is in your inventory',
             'search [object] -Tells you what is in a container',
@@ -190,11 +191,9 @@ class ZaryaGame:
             'You can also use abbreviations for some commands.',
         ]
 
-        functions = list()
-
         # npc interact subroutines
-        async def talktocrewmate():
-            await stutter('Hello there! Glad to see you got that malfunctioning hatch open.')
+        # async def talktocrewmate():
+        #     await stutter('Hello there! Glad to see you got that malfunctioning hatch open.')
 
         # item use subroutines
         async def usepaper():
@@ -205,10 +204,10 @@ class ZaryaGame:
 
         async def usedrive():
             if 'laptop' in inventory or 'laptop' in Room['Items']:
-                if 'Files' in Drive:
+                if 'Files' in drive:
                     await stutter('You transfer all the files on the usb stick to the laptop.')
-                    Laptop['Files'] = Drive['Files']
-                    del Drive['Files']
+                    laptop.files = drive.files
+                    drive.files = []
                 else:
                     await stutter('There are no files on the usb stick.')
             else:
@@ -216,7 +215,7 @@ class ZaryaGame:
 
         async def usejumpsuit():
             await stutter('You put on the jumpsuit.')
-            Player['Wearing'] = 'RussianJumpsuit'
+            player.wearing = 'Russian jumpsuit'
             await stutter('You were already wearing one, however, so you are now wearing two jumpsuits.')
             await stutter('Good job.')
 
@@ -251,28 +250,28 @@ class ZaryaGame:
 
         async def usebed():
             await stutter("You get in the 'bed'.")
-            if Player['Sleep'] > 8:
+            if player.sleep > 8:
                 await stutter('You sleep until you are no longer tired.')
                 nonlocal FicEpoch
-                FicEpoch += Player['Sleep'] * 3600
-                Player['Sleep'] = 0
+                FicEpoch += player.sleep * 3600
+                player.sleep = 0
                 await stutter('Date: ' + datetime.fromtimestamp(FicEpoch).strftime('%d.%m.%Y'))
             else:
                 await stutter('You are not tired enough to get to sleep.')
 
         async def uselaptop():
-            if Laptop['Tutorial'] == 'Pending':
+            if laptop.tutorial == 'Pending':
                 await stutter('There is a sticker on the laptop that lists things you can do with it.')
                 await stutterf('browse web')
                 await stutterf('use messenger app')
                 await stutterf('read files')
                 await stutterf('play text game')
                 await stutterf('control station module')
-                Laptop['Tutorial'] = 'Complete'
+                laptop.tutorial = 'Complete'
                 await n()
             await stutter('You turn on the laptop.')
-            Laptop['State'] = 'On'
-            while Laptop['State'] == 'On':
+            laptop.state = 'On'
+            while laptop.state == 'On':
                 await n()
                 task = await discord_input(self.discord_client, self.req_channel_name)
                 self.log(task)
@@ -280,7 +279,7 @@ class ZaryaGame:
 
                 if task in 'turn off laptop':
                     await stutter('You turn off the laptop.')
-                    Laptop['State'] = 'Off'
+                    laptop.state = 'Off'
 
                 elif task in ['browse web', 'browse', 'web']:
                     await stutter('A browser window opens. Where do you want to go?')
@@ -298,11 +297,11 @@ class ZaryaGame:
                         await stutter('You have no internet connection.')
 
                 elif task in ['read files', 'read', 'files']:
-                    if Laptop['Files'] == 'None':
+                    if not laptop.files:
                         await stutter('You have no files to read!')
                     else:
                         await stutter('The files say: ')
-                        await stutter(Laptop['Files'])
+                        await stutter('\n'.join(laptop.files))
 
                 elif task in ['use messenger app', 'messenger app', 'messenger']:
                     contacts = ['nasa social media team']
@@ -416,7 +415,7 @@ class ZaryaGame:
         zarya_boxes_items = [paper, drive, jumpsuit]
         zarya_boxes = ZaryaContainer(
             name=STRS_GAME['containers']['zarya_boxes']['name'], desc=STRS_GAME['containers']['zarya_boxes']['desc'],
-            can_leave=True, items=containers_items
+            can_leave=True, items=zarya_boxes_items
         )
 
         # rooms
@@ -469,7 +468,7 @@ class ZaryaGame:
         ]
 
         # start game
-        Room = Zarya
+        room = zarya
         FicEpoch = 968716800
         await stutterf(f'Zarya-Discord v{__version__}')
         await stutterf('© Joel McBride 2017, 2021')
@@ -481,7 +480,7 @@ class ZaryaGame:
         # command reader
         Carry = {'On': True}
         while Carry['On']:
-            Player['Sleep'] += 1
+            player.sleep += 1
             FicEpoch += 3600
             await n()
             Do = str.lower(await discord_input(self.discord_client, self.req_channel_name))
@@ -560,7 +559,7 @@ class ZaryaGame:
                     await stutter('You leave the ' + str.lower(Room['Name']) + '.')
                     Room = PrevRoom
                 else:
-                    await stutter(f"I'm sorry {Player['Name']}, I'm afraid you can't do that.")
+                    await stutter(f"I'm sorry {player.name}, I'm afraid you can't do that.")
 
             elif 'go through' in Do or 'gt' in Do or 'go' in Do:
                 if 'go through' in Do and 'port' in Do:
@@ -653,8 +652,8 @@ class ZaryaGame:
 
             elif Do.startswith('setname'):
                 new_name = Do.removeprefix('setname').strip()
-                Player['Name'] = new_name
-                await stutter(f"Your name is {Player['Name']}.")
+                player.name = new_name
+                await stutter(f"Your name is {player.name}.")
 
             else:
                 await stutter("That's not a valid command.")
