@@ -53,6 +53,7 @@ class ZaryaItem:
             self.usefunc = usefunc
 
 
+# TODO: allow giving an identifier to the constructor to automatically get the name and desc from the strings file
 class ZaryaContainer:
     """Class for containers.
 
@@ -104,14 +105,16 @@ class ZaryaRoom(ZaryaContainer):
     Attrs:
         desc -- look message of room
         can_leave -- whether you can leave the room, should be False
+        has_windows -- determines whether the camera can be used in this room
         items -- items in the room, a list of ZaryaItems or None
         containers -- a list of ZaryaContainers which you can enter, or None
         ports -- a list of ZaryaPorts which may be open or closed, or None
     """
-    def __init__(self, name: str, desc: str, can_leave: bool = False, items: List[ZaryaItem] = None,
-                 containers: List[ZaryaContainer] = None, ports: List[ZaryaPort] = None):
+    def __init__(self, name: str, desc: str, can_leave: bool = False, has_windows: bool = False,
+                 items: List[ZaryaItem] = None, containers: List[ZaryaContainer] = None, ports: List[ZaryaPort] = None):
         super().__init__(name, desc, can_leave, items)
 
+        self.has_windows = has_windows
         self.containers = containers
         self.ports = ports
 
@@ -365,109 +368,90 @@ class ZaryaGame:
                     await stutter("The laptop can't do that!")
 
         # items
-        Laptop = {
-            'Name': 'Laptop', 'Desc': ' a laptop on the wall.',
-            'Usable': 'Yes', 'Takeable': 'Yes',
-            'State': 'Off', 'Tutorial': 'Pending', 'Files': 'None',
-            'usefunc': uselaptop,
-        }
+        laptop = ZaryaItem(
+            name=STRS_ITEMS['laptop']['name'], desc=STRS_ITEMS['laptop']['desc'],
+            can_use=True, can_take=False, usefunc=uselaptop
+        )
+        laptop.state = 'off'
+        laptop.tutorial = 'Pending'
+        laptop.files = []
 
-        Paper = {
-            'Name': 'Paper', 'Desc': ' a strip of paper.',
-            'Usable': 'Yes', 'Takeable': 'Yes',
-            'usefunc': usepaper,
-        }
-        Drive = {
-            'Name': 'Drive', 'Desc': ' a usb stick.',
-            'Usable': 'Yes', 'Takeable': 'Yes',
-            'Files': "'print('hello world!')'",
-            'usefunc': usedrive,
-        }
-        Jumpsuit = {
-            'Name': 'Jumpsuit',
-            'Desc': ' a blue jumpsuit with the flag of THE GLORIOUS SOVIET UNION I mean, Russia, on it.',
-            'Usable': 'Yes', 'Takeable': 'Yes',
-            'usefunc': usejumpsuit,
-        }
+        paper = ZaryaItem(
+            name=STRS_ITEMS['paper'], desc=STRS_ITEMS['paper']['desc'],
+            can_use=True, can_take=True, usefunc=usepaper
+        )
 
-        Greenhouse = {
-            'Name': 'Lada',
-            'Desc': ' a little greenhouse thing with sprouts growing in it.',
-            'Usable': 'Yes',
-            'usefunc': usegreenhouse,
-        }
-        Camera = {
-            'Name': 'Camera', 'Desc': ' a DSLR camera and a few lenses on the wall.',
-            'Usable': 'Yes', 'Takeable': 'Yes',
-            'usefunc': usecamera,
-        }
-        Toilet = {
-            'Name': 'Space Toilet', 'Desc': ' a bogstandard space toilet in a little cubicle. Pun intended.',
-            'Usable': 'Yes',
-            'usefunc': usetoilet,
-        }
-        Bed = {
-            'Name': 'Sleeping Bag',
-            'Desc': ' a simple sleeping bag strapped securely to a wall.',
-            'Usable': 'Yes',
-            'usefunc': usebed,
-        }
+        drive = ZaryaItem(
+            name=STRS_ITEMS['drive']['name'], desc=STRS_ITEMS['drive']['desc'],
+            can_use=True, can_take=True, usefunc=usedrive
+        )
+        drive.files = {'program.py': "'print('hello world!')'"}
 
-        # objects
-        ContainersItems = {'paper': Paper, 'drive': Drive, 'jumpsuit': Jumpsuit}
-        Containers = {'Name': 'Containers', 'Items': ContainersItems,
-                      'Leavable': True,
-                      'Desc': 'looking in the containers lining the walls.'}
+        jumpsuit = ZaryaItem(
+            name=STRS_ITEMS['jumpsuit']['name'], desc=STRS_ITEMS['jumpsuit']['desc'],
+            can_use=True, can_take=True, usefunc=usejumpsuit
+        )
+
+        greenhouse = ZaryaItem(
+            name=STRS_ITEMS['greenhouse']['name'], desc=STRS_ITEMS['greenhouse']['desc'],
+            can_use=True, usefunc=usegreenhouse
+        )
+
+        camera = ZaryaItem(
+            name=STRS_ITEMS['camera']['name'], desc=STRS_ITEMS['camera']['desc'],
+            can_use=True, can_take=True, usefunc=usecamera
+        )
+
+        toilet = ZaryaItem(
+            name=STRS_ITEMS['toilet']['name'], desc=STRS_ITEMS['toilet']['desc'],
+            can_use=True, usefunc=usetoilet
+        )
+
+        bed = ZaryaItem(
+            name=STRS_ITEMS['bed']['name'], desc=STRS_ITEMS['bed']['desc'],
+            can_use=True, usefunc=usebed
+        )
+
+        # containers
+        zarya_boxes_items = [paper, drive, jumpsuit]
+        zarya_boxes = ZaryaContainer(
+            name=STRS_GAME['containers']['zarya_boxes']['name'], desc=STRS_GAME['containers']['zarya_boxes']['desc'],
+            can_leave=True, items=containers_items
+        )
 
         # rooms
+        zarya = ZaryaRoom(
+            name=STRS_ROOMS['zarya']['name'], desc=STRS_ROOMS['zarya']['desc'],
+            can_leave=False, items=[laptop], containers=[zarya_boxes], ports=['TODO ADD PORTS HERE']
+        )
         ZaryaPorts = {'front': 'open', 'nadir': 'closed', 'aft': 'open'}
         ZaryaNear = {'front': 'Unity', 'aft': 'Zvezda'}
-        ZaryaItems = {'laptop': Laptop}
-        ZaryaObjects = {'containers': Containers}
-        Zarya = {
-            'Name': 'Zarya', 'Leavable': False,
-            'Ports': ZaryaPorts, 'Near': ZaryaNear,
-            'Items': ZaryaItems, 'Objects': ZaryaObjects,
-            'Desc': 'in a bland white module, what may sometimes be considered the walls \nlined with storage ' 
-                    'containers.'
-        }
 
+        unity = ZaryaRoom(
+            name=STRS_ROOMS['unity']['name'], desc=STRS_ROOMS['unity']['desc'],
+            can_leave=False, ports=['TODO ADD PORTS HERE']
+        )
         UnityPorts = {
             'front': 'closed', 'nadir': 'closed',
             'port': 'closed', 'zenith': 'closed',
             'starboard': 'closed', 'aft': 'open'
         }
         UnityNear = {'aft': 'Zarya'}
-        UnityItems = dict()
-        UnityObjects = dict()
-        Unity = {
-            'Name': 'Unity', 'Leavable': False,
-            'Ports': UnityPorts, 'Near': UnityNear,
-            'Items': UnityItems, 'Objects': UnityObjects,
-            'Desc': 'in one of the nodes that links part of the station. '
-        }
 
+        zvezda = ZaryaRoom(
+            name=STRS_ROOMS['zvezda']['name'], desc=STRS_ROOMS['zvezda']['desc'],
+            can_leave=False, has_windows=True, items=[greenhouse, camera, toilet, bed], ports=['TODO ADD PORTS HERE']
+        )
         ZvezdaPorts = {
             'front': 'open', 'nadir': 'closed',
             'zenith': 'closed', 'aft': 'closed'
         }
         ZvezdaNear = {'front': 'Zarya'}
-        ZvezdaItems = {'greenhouse': Greenhouse, 'camera': Camera, 'toilet': Toilet,
-                       'bed': Bed}
-        ZvezdaObjects = dict()
-        Zvezda = {
-            'Name': 'Zvezda', 'Leavable': 0, 'Windows': 'Yes',
-            'Ports': ZvezdaPorts, 'Near': ZvezdaNear,
-            'Items': ZvezdaItems, 'Objects': ZvezdaObjects,
-            'Desc': "in a three-part service module, with a spherical 'Transfer "
-                    "Compartment' to the front, a 'Work Compartment' with living "
-                    'quarters and life support, where things are done, and to aft a '
-                    "'Transfer Chamber'."
-        }
 
         # player
-        Player = {'Name': 'Player', 'Wearing': 'Jumpsuit',
-                  'Inventory': inventory, 'Images': 0, 'Sleep': 5}
+        player = ZaryaPlayer(
+            name=STRS_GAME['player']['name_default'], inventory=[], wearing='jumpsuit'
+        )
 
         # def helpwindow():
         #     helpw = Tk()
@@ -478,7 +462,8 @@ class ZaryaGame:
         #     for help_info_item in help_info:
         #         text.append(helpc.create_text(325, (i*20)+20, text=help_info_item))
 
-        Months = [
+        # TODO: get this from some module instead?
+        months = [
             'January', 'February', 'March', 'April', 'May', 'June',
             'July', 'August', 'September', 'October', 'November', 'December'
         ]

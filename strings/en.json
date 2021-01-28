@@ -73,7 +73,7 @@
         "desc": "in one of the nodes that links part of the station"
       },
 
-      "Zvezda": {
+      "zvezda": {
         "name": "Zvezda",
         "proper_name": "Zvezda",
         "desc": "in a three-part service module, with a spherical 'Transfer Compartment' to the front, a 'Work Compartment' with living quarters and life support, where things are done, and to aft a 'Transfer Chamber'"
