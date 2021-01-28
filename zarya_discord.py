@@ -89,7 +89,7 @@ class ZaryaPort:
         port_open
         room -- if applicable, the ZaryaRoom which you will enter by going through the port
     """
-    def __init__(self, name: str, port_open: bool, room=None):
+    def __init__(self, name: str, port_open: bool = False, room=None):
         self.name = name
         self.port_open = port_open
         if self.port_open and room is not None:
@@ -419,33 +419,40 @@ class ZaryaGame:
         )
 
         # rooms
+        # TODO: fix these references
+        zarya_ports = [
+            ZaryaPort(name='front', port_open=True, room=unity),
+            ZaryaPort('nadir'),
+            ZaryaPort(name='aft', port_open=True, room=zvezda),
+        ]
         zarya = ZaryaRoom(
             name=STRS_ROOMS['zarya']['name'], desc=STRS_ROOMS['zarya']['desc'],
-            can_leave=False, items=[laptop], containers=[zarya_boxes], ports=['TODO ADD PORTS HERE']
+            can_leave=False, items=[laptop], containers=[zarya_boxes], ports=zarya_ports
         )
-        ZaryaPorts = {'front': 'open', 'nadir': 'closed', 'aft': 'open'}
-        ZaryaNear = {'front': 'Unity', 'aft': 'Zvezda'}
 
+        unity_ports = [
+            ZaryaPort('front'),
+            ZaryaPort('nadir'),
+            ZaryaPort('port'),
+            ZaryaPort('zenith'),
+            ZaryaPort('starboard'),
+            ZaryaPort(name='aft', port_open=True, room=zarya),
+        ]
         unity = ZaryaRoom(
             name=STRS_ROOMS['unity']['name'], desc=STRS_ROOMS['unity']['desc'],
-            can_leave=False, ports=['TODO ADD PORTS HERE']
+            can_leave=False, ports=unity_ports
         )
-        UnityPorts = {
-            'front': 'closed', 'nadir': 'closed',
-            'port': 'closed', 'zenith': 'closed',
-            'starboard': 'closed', 'aft': 'open'
-        }
-        UnityNear = {'aft': 'Zarya'}
 
+        zvezda_ports = [
+            ZaryaPort(name='front', port_open=True, room=zarya),
+            ZaryaPort('nadir'),
+            ZaryaPort('zenith'),
+            ZaryaPort('aft'),
+        ]
         zvezda = ZaryaRoom(
             name=STRS_ROOMS['zvezda']['name'], desc=STRS_ROOMS['zvezda']['desc'],
-            can_leave=False, has_windows=True, items=[greenhouse, camera, toilet, bed], ports=['TODO ADD PORTS HERE']
+            can_leave=False, has_windows=True, items=[greenhouse, camera, toilet, bed], ports=zvezda_ports
         )
-        ZvezdaPorts = {
-            'front': 'open', 'nadir': 'closed',
-            'zenith': 'closed', 'aft': 'closed'
-        }
-        ZvezdaNear = {'front': 'Zarya'}
 
         # player
         player = ZaryaPlayer(
@@ -515,8 +522,8 @@ class ZaryaGame:
                 break
 
             elif Do in ['look around', 'look', 'la', 'l']:
-                await stutter('You are ' + Room['Desc'] + ' ')
-                Items = Room['Items']
+                await stutter('You are ' + room.desc + ' ')
+                Items = room.items
                 if len(Items) > 0:
                     ItemVars = list(Items.values())
                     for i, value in enumerate(Items):
