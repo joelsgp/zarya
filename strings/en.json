@@ -81,7 +81,7 @@
     },
 
     "player": {
-      "name": "Player"
+      "name_default": "Player"
     },
 
     "actions": {

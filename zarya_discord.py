@@ -1,4 +1,6 @@
+import os
 import random
+import json
 import urllib.request
 import urllib.error
 
@@ -15,6 +17,17 @@ __version__ = '0.1.0'
 # TODO: more comprehensive refactor, oop etc.
 
 
+# need to make this dynamic
+LANG = 'en'
+# load strings
+with open(os.path.join('strings', f'{LANG}.json')) as strings_file:
+    STRINGS = json.load(strings_file)
+# strings shortcuts
+STRS_GAME = STRINGS['game']
+STRS_ITEMS = STRS_GAME['items']
+STRS_ROOMS = STRS_GAME['rooms']
+
+
 class ZaryaItem:
     """Class for items.
 
@@ -27,7 +40,7 @@ class ZaryaItem:
         can_take
         usefunc -- function to be run when the item is used
     """
-    desc_stem = 'There is '
+    desc_stem = STRS_ITEMS['desc_stem']
 
     def __init__(self, name: str, desc: str, can_use: bool = False, can_take: bool = False, usefunc: Callable = None):
         self.name = name
@@ -53,7 +66,7 @@ class ZaryaContainer:
         items -- items in the container, a list of ZaryaItems or None
     """
 
-    desc_stem = 'You are '
+    desc_stem = STRS_GAME['containers']['desc_stem']
 
     def __init__(self, name: str, desc: str, can_leave: bool = True, items: List[ZaryaItem] = None):
         self.name = name
@@ -112,7 +125,7 @@ class ZaryaPlayer:
         wearing -- outfit
         sleep -- how much sleep as a float
     """
-    name = 'Player'
+    name = STRS_GAME['player']['name_default']
 
     def __init__(self, name: str, inventory: List[ZaryaItem], wearing, sleep: float = 5):
         self.name = name
