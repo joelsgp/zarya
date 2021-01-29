@@ -9,6 +9,7 @@ import zarya_discord
 
 
 # TODO: improved framework, compatibility with builtin print and input, more features, etc.
+# plan: new framework: discord_funcs input and print -> zarya_discord -> bot.py
 # TODO: create strings file, csv parser for translations, lang setting in settings
 # TODO: add func to change persistent settings
 

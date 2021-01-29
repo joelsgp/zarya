@@ -83,17 +83,21 @@ class ZaryaPort:
 
     A port has a name, which should correspond to a direction in orbit, like the ones used to describe ISS ports.
     A port will be open or closed. If open, it may have a room which you will enter by going through it.
+    If closed, trying to get the room attribute may raise an AttributeError.
 
     Attrs:
         name
-        port_open
+        is_open
         room -- if applicable, the ZaryaRoom which you will enter by going through the port
     """
-    def __init__(self, name: str, port_open: bool = False, room=None):
+    def __init__(self, name: str, is_open: bool = False, room=None):
         self.name = name
-        self.port_open = port_open
-        if self.port_open and room is not None:
+        self.is_open = is_open
+        if self.is_open and room is not None:
             self.room = room
+
+    def __str__(self):
+        return self.name
 
 
 class ZaryaRoom(ZaryaContainer):
@@ -118,6 +122,9 @@ class ZaryaRoom(ZaryaContainer):
         self.containers = containers
         self.ports = ports
 
+    def __str__(self):
+        return self.name
+
 
 class ZaryaPlayer:
     """Class for the player character.
@@ -136,11 +143,16 @@ class ZaryaPlayer:
         self.wearing = wearing
         self.sleep = sleep
 
+    def __str__(self):
+        return self.name
+
 
 class ZaryaGame:
     skip = False
 
     current_room = zarya
+    # TODO: change this somehow
+    previous_room = zarya
     posix_time_ingame = 968716800
 
     # list of commands for help
@@ -417,9 +429,9 @@ class ZaryaGame:
     # rooms
     # TODO: fix these references
     zarya_ports = [
-        ZaryaPort(name='front', port_open=True, room=unity),
+        ZaryaPort(name='front', is_open=True, room=unity),
         ZaryaPort('nadir'),
-        ZaryaPort(name='aft', port_open=True, room=zvezda),
+        ZaryaPort(name='aft', is_open=True, room=zvezda),
     ]
     zarya = ZaryaRoom(
         name=STRS_ROOMS['zarya']['name'], desc=STRS_ROOMS['zarya']['desc'],
@@ -432,7 +444,7 @@ class ZaryaGame:
         ZaryaPort('port'),
         ZaryaPort('zenith'),
         ZaryaPort('starboard'),
-        ZaryaPort(name='aft', port_open=True, room=zarya),
+        ZaryaPort(name='aft', is_open=True, room=zarya),
     ]
     unity = ZaryaRoom(
         name=STRS_ROOMS['unity']['name'], desc=STRS_ROOMS['unity']['desc'],
@@ -440,7 +452,7 @@ class ZaryaGame:
     )
 
     zvezda_ports = [
-        ZaryaPort(name='front', port_open=True, room=zarya),
+        ZaryaPort(name='front', is_open=True, room=zarya),
         ZaryaPort('nadir'),
         ZaryaPort('zenith'),
         ZaryaPort('aft'),
@@ -517,117 +529,113 @@ class ZaryaGame:
                 break
 
             elif command_input in ['look around', 'look', 'la', 'l']:
-                await self.stutter('You are ' + self.current_room.desc + ' ')
-                Items = self.current_room.items
-                if len(Items) > 0:
-                    ItemVars = list(Items.values())
-                    for i, value in enumerate(Items):
-                        await self.stutter(f"There is{ItemVars[i]['Desc']}")
-                if 'Ports' in self.current_room:
-                    await self.stutter('There are ' + str(len(self.current_room['Ports'])) + ' ports: ')
-                    Ports = self.current_room['Ports']
-                    PortTypes = list(Ports.keys())
-                    PortStates = list(Ports.values())
-                    for i, value in enumerate(self.current_room['Ports']):
-                        await self.stutter(f'One to {PortTypes[i]} that is {PortStates[i]}.')
+                await self.stutter(f'{self.current_room.desc_stem.rstrip()} {self.current_room.desc}')
+
+                if self.current_room.items:
+                    for item in self.current_room.items:
+                        await self.stutter(f'{item.desc_stem.rstrip()} {item.desc}')
+
+                if self.current_room.ports:
+                    await self.stutter(f'There are {len(self.current_room.ports)} ports: ')
+                    for port in self.current_room.ports:
+                        port_state = 'open' if port.is_open else 'closed'
+                        await self.stutter(f'One to {port.name} that is {port_state}.')
 
             elif command_input in ['show inventory', 'inventory', 'si', 'i']:
                 if not self.player.inventory:
                     await self.stutter('Your inventory is empty.')
                 else:
                     await self.stutter('In your inventory is: ')
-                    for inventory_item in self.player.inventory.keys():
-                        await self.stutter(inventory_item)
+                    for inventory_item in self.player.inventory:
+                        await self.stutter(inventory_item.desc)
 
-            elif 'search' in command_input:
-                Object = command_input[7:]
-                if Object in self.current_room['Objects']:
-                    PrevRoom = self.current_room
-                    await self.stutter(f'You search the {Object}.')
-                    ObjectIndx = self.current_room['Objects']
-                    self.current_room = ObjectIndx[Object]
-                    Items = list(Room['Items'])
-                    if len(Items) > 0:
-                        await self.stutter(f'The {Object} contain(s):')
-                        for item in Items:
-                            await self.stutter(item)
+            elif command_input.startswith('search'):
+                container_to_search = command_input.removeprefix('search').lstrip()
+                # could use any() here?
+                if container_to_search in [container.name for container in self.current_room.containers]:
+                    self.previous_room = self.current_room
+                    await self.stutter(f'You search the {container_to_search}.')
+                    # TODO: shorten, maybe clean up
+                    self.current_room = next([container for container in self.current_room.containers if container.name == container_to_search])
+
+                    if self.current_room.items:
+                        await self.stutter(f'The {container_to_search} contain(s):')
+                        for item in self.current_room.items:
+                            await self.stutter(item.desc)
                     else:
                         await self.stutter("There isn't anything here.")
                 else:
                     await self.stutter("That isn't in here.")
 
-            elif 'leave' in command_input:
-                if self.current_room['Leavable'] == 1:
-                    await self.stutter('You leave the ' + str.lower(Room['Name']) + '.')
-                    self.current_room = PrevRoom
+            elif command_input in ['leave'] or command_input.startswith(['leave']):
+                if self.current_room.can_leave:
+                    await self.stutter(f'You leave the {self.current_room.name}.')
+                    self.current_room = self.previous_room
                 else:
-                    await self.stutter(f"I'm sorry {player.name}, I'm afraid you can't do that.")
+                    await self.stutter(f"I'm sorry {self.player.name}, I'm afraid you can't do that.")
 
-            elif 'go through' in command_input or 'gt' in command_input or 'go' in command_input:
-                if 'go through' in command_input and 'port' in command_input:
-                    SubStringEnd = command_input.index('port')
-                    SubStringEnd = SubStringEnd - 1
-                    Direction = command_input[11:SubStringEnd]
-                elif 'go through' in command_input:
-                    Direction = command_input[11:]
-                elif 'gt' in command_input and 'p' in command_input:
-                    SubStringEnd = command_input.index('p')
-                    SubStringEnd = SubStringEnd - 1
-                    Direction = command_input[3:SubStringEnd]
-                elif 'gt' in command_input or 'go' in command_input:
-                    Direction = command_input[3:]
-                if Direction in self.current_room['Ports']:
-                    Ports = self.current_room['Ports']
-                    if Ports[Direction] == 'open':
-                        Near = self.current_room['Near']
-                        NextRoom = Near[Direction]
-                        await self.stutter('You go through the port into ' + NextRoom + '.')
-                        self.current_room = eval(Near[Direction])
+            # TODO: clean this logic statement up
+            elif command_input.startswith(('go through', 'gt', 'go')):
+                if command_input.endswith('port'):
+                    direction = command_input.removesuffix('port').rstrip()
+                else:
+                    direction = command_input
+
+                # note: less verbose commands must come later in the list or an incomplete prefix could be stripped.
+                for prefix in ['go through', 'gt', 'go']:
+                    if direction.startswith(prefix):
+                        direction = direction.removeprefix(prefix).lstrip()
+                        break
+
+                if direction in [port.name for port in self.current_room.ports]:
+                    target_port = next([port for port in self.current_room.ports if port.name == direction])
+                    if target_port.is_open:
+                        await self.stutter(f'You go through the port into {target_port.room.name}.')
+                        self.current_room = target_port.room
                     else:
                         await self.stutter('That port is closed.')
                 else:
                     await self.stutter("The module you're in doesn't have a port there.")
 
             elif command_input in ['take all', 'ta']:
-                ItemsList = list(Room['Items'])
-                if len(ItemsList) > 0:
-                    await self.stutter('You: ')
-                    await self.stutter('TAKE ')
-                    await self.stutter('ALL THE THINGS.')
-                    Items = self.current_room['Items']
-                    for i, value in enumerate(Items):
-                        Item = ItemsList[i]
-                        TrueItem = str.upper(Item[0]) + Item[1:]
-                        if 'Takeable' in eval(TrueItem):
-                            Details = Items[Item]
-                            inventory[Item] = Details
-                            del Items[Item]
+                if self.current_room.items:
+                    # TODO: ? add ascii art here lol
+                    await self.stutter('You: \n'
+                                       'TAKE \n'
+                                       'ALL THE THINGS.')
+
+                    for item in self.current_room.items:
+                        if item.can_take:
+                            self.player.inventory.append(item)
+                            await self.stutter(f'Youo take the {item.name}.')
+                            # TODO: change this? editing in place is discouraged and may not work
+                            self.current_room.items.remove(item)
                         else:
-                            await self.stutter(f"You can't take the {Item}.")
+                            await self.stutter(f"You can't take the {item.name}.")
                 else:
                     await self.stutter("There's nothing here.")
 
-            elif 'take' in command_input:
-                Item = command_input[5:]
-                Items = self.current_room['Items']
-                Details = Items[Item]
-                if Item in Items:
-                    TrueItem = Item.title()
-                    if 'Takeable' in eval(TrueItem):
-                        await self.stutter('You take the ' + Item + '.')
-                        inventory[Item] = Details
-                        del Items[Item]
+            elif command_input.startswith('take'):
+                item_to_take = command_input.removeprefix('take').lstrip()
+                if item_to_take in [item.name for item in self.current_room.items]:
+                    item = next([item for item in self.current_room.items if item.name == item_to_take])
+                    if item.can_take:
+                        await self.stutter(f'You take the {item.name}.')
+                        self.player.inventory.append(item)
+                        self.current_room.items.remove(item)
                     else:
                         await self.stutter("You can't take that.")
                 else:
                     await self.stutter("That item isn't here.")
 
-            elif 'use' in command_input:
-                Item = command_input[4:]
-                if Item in inventory or Item in self.current_room['Items']:
-                    TrueItem = Item.title()
-                    if 'Usable' in eval(TrueItem):
-                        await eval(TrueItem)['usefunc']()
+            elif command_input.startswith('use'):
+                item_to_use = command_input.removeprefix('use').lstrip()
+
+                # TODO: fix
+                if item_to_use in self.player.inventory or item_to_use in self.current_room.items:
+                    item = 'uhhh fix this yeah'
+                    if item.can_use:
+                        await item.usefunc()
                     else:
                         await self.stutter("That item isn't usable.")
                 else:
@@ -652,10 +660,11 @@ class ZaryaGame:
                 self.skip = False
                 await self.stutter('Text will now output gradually.')
 
+            # TODO: allow just 'name' as invocation?
             elif command_input.startswith('setname'):
-                new_name = command_input.removeprefix('setname').strip()
-                player.name = new_name
-                await self.stutter(f"Your name is {player.name}.")
+                new_name = command_input.removeprefix('setname').lstrip()
+                self.player.name = new_name
+                await self.stutter(f"Your name is {self.player.name}.")
 
             else:
                 await self.stutter("That's not a valid command.")
