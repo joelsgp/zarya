@@ -1,1 +1,1 @@
-from discord_funcs import *
+from .discord_funcs import *
