@@ -18,6 +18,7 @@ import game.zarya_discord as zarya_discord
 # https://discord.com/api/oauth2/authorize?client_id=799634237355065395&permissions=8&scope=bot
 
 
+GITHUB_URL = 'https://github.com/JMcB17/Zarya'
 PREFIXES = (
     '>', '> ',
     '9v', '9v ',
@@ -33,6 +34,11 @@ client = discord.ext.commands.bot.Bot(command_prefix=PREFIXES, help_command=help
 @client.event
 async def on_ready():
     print('Bot running.')
+
+
+@client.command(aliases=['github'])
+async def git(ctx):
+    ctx.channel.send(GITHUB_URL)
 
 
 @client.command(aliases=['log', 'log.txt'])
