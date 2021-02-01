@@ -274,7 +274,7 @@ class ZaryaGame:
     async def use_laptop(self):
         # tutorial
         if not self.laptop.tutorial_done:
-            await self.stutter('There is a sticker on the laptop that lists things you can do with it.')
+            await self.stutter('There is a sticker on the laptop that lists things you can do with it:')
             await self.stutterf('browse web \n'
                                 'use messenger app \n'
                                 'read files \n'
@@ -362,6 +362,7 @@ class ZaryaGame:
                 else:
                     await self.stutter("They aren't in your contacts list.")
 
+            # todo: fix
             elif task in 'play text game':
                 await ZaryaGame(self.discord_client, self.send_channel, self.req_channel_name).run()
 
@@ -596,6 +597,7 @@ class ZaryaGame:
                 await self.stutter('Thanks for playing!', self.send_channel)
                 break
 
+            # todo: fix rate limiting on ports list
             elif command_input in ['look around', 'look', 'la', 'l']:
                 await self.stutter(f'{self.current_room.desc_stem.rstrip()} {self.current_room.desc}.')
 
@@ -617,7 +619,7 @@ class ZaryaGame:
                     for inventory_item in self.player.inventory:
                         await self.stutter(inventory_item.name)
 
-            elif command_input == 'BUYBURGER':
+            elif command_input == 'buyburger':
                 await self.stutter('BURGER. 🍔 MMM...')
 
             elif command_input.startswith('search'):
