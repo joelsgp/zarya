@@ -44,10 +44,10 @@ async def logs(ctx):
 
 @client.command()
 async def play(ctx):
-    # game = zarya_discord.ZaryaGame(client, ctx.channel, settings['discord']['channel'])
-    game = zarya_discord.ZaryaGame(client, ctx.channel, ctx.channel.name)
-    game.log_start()
-    await game.run()
+    # game_instance = zarya_discord.ZaryaGame(client, ctx.channel, settings['discord']['channel'])
+    game_instance = zarya_discord.ZaryaGame(client, ctx.channel, ctx.channel.name)
+    game_instance.log_start()
+    await game_instance.run()
 
 
 if __name__ == '__main__':
