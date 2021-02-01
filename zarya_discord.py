@@ -11,11 +11,7 @@ from typing import List, Callable
 from discord_funcs import discord_input, discord_stutter
 
 
-__version__ = '0.1.0'
-
-
-# TODO: more comprehensive refactor, oop etc.
-# TODO: combine discord_print() calls to help with rate limiting
+__version__ = '0.10.0'
 
 
 # need to make this dynamic
@@ -266,7 +262,6 @@ class ZaryaGame:
         await self.stutter("You do your business in the space toilet. Don't ask an astronaut "
                            "how this \nhappens if you meet one, they're tired of the question.")
 
-    # todo: make the player fall asleep if sleepiness reaches 48. also give a warning at 40
     async def use_bed(self):
         await self.stutter("You get in the 'bed'.")
         self.player.sleep(self)
@@ -530,7 +525,20 @@ class ZaryaGame:
         # command reader
         while self.carry['on']:
             self.player.sleepiness += 1
-            self.posix_time_ingame += 3600
+            # one hour
+            self.posix_time_ingame += 60 ** 3
+            # could check at like 8 as well but don't want to bother the player, it's not an educational game
+            if self.player.sleepiness >= 24:
+                await self.stutter("You haven't slept for a while. You're starting to feel very sleepy.")
+            elif self.player.sleepiness >= 40:
+                await self.stutter("You haven't slept in too long. "
+                                   "You're very, very tired and you're going to black out soon.")
+            elif self.player.sleepiness >= 48:
+                await self.stutter("You start to nod off. Before you fall asleep you realise you haven't slept in "
+                                   'about two days.')
+                self.player.sleep(self)
+                await self.stutter('You wake up floating around. You should have slept in your bed sooner.')
+
             await self.n()
             command_input = await discord_input(self.discord_client, self.req_channel_name)
             command_input = command_input.lower()
