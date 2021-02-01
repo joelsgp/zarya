@@ -276,10 +276,10 @@ class ZaryaGame:
                                 'read files \n'
                                 'play text game \n'
                                 'control station module')
+            await self.stutter("Now that you've read the sticker, you peel it off.")
             self.laptop.tutorial_done = True
             await self.n()
 
-        # todo: add option to redo tutorial
         await self.stutter('You turn on the laptop.')
         self.laptop.powered_on = True
         while self.laptop.powered_on:
@@ -291,6 +291,15 @@ class ZaryaGame:
             if task in 'turn off laptop':
                 await self.stutter('You turn off the laptop.')
                 self.laptop.powered_on = False
+
+            if task in ['h', 'help', 'tutorial', 'redo tutorial', 'sticker', 'put sticker back on']:
+                self.laptop.tutorial_done = False
+                await self.stutter(
+                    'You decide to stick the sticker that lists what you can do with the laptop '
+                    'back on. \n'
+                    'If you want to read it again, you have to turn the laptop off and on again. \n'
+                    'You think this is pretty stupid.'
+                )
 
             elif task in ['browse web', 'browse', 'web']:
                 await self.stutter('A browser window opens. Where do you want to go?')
@@ -545,7 +554,7 @@ class ZaryaGame:
             self.log(command_input)
             await self.n()
 
-            if command_input in ['help', 'h']:
+            if command_input in ['help', 'h', 'commands']:
                 help_info_block = '\n'.join(self.help_info)
                 await self.stutterf(help_info_block)
                 await self.stutter('For the uninitiated: \n'
