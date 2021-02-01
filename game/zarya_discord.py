@@ -21,6 +21,8 @@ __version__ = '0.11.0'
 
 
 # need to make this dynamic
+DISCORD_NAME = 'JMcB#7918'
+DUKT_INVITE = 'https://discord.gg/UAe4fB7EHZ'
 LANG = 'en'
 # load strings
 with open(os.path.join('strings', f'{LANG}.json')) as strings_file:
@@ -547,9 +549,9 @@ class ZaryaGame:
         await self.stutterf(
             f'Zarya-Discord v{__version__} \n'
             '© Joel McBride 2017, 2021 \n'
-            "Remember to report any bugs or errors to 'JMcB#7918' - @ or DM me. \n"
+            f"Remember to report any bugs or errors to '{DISCORD_NAME}' - @ or DM me. \n"
             # todo: change once translations are available
-            'Hosting and translations (pending) with help from Dukt <https://discord.gg/UAe4fB7EHZ>'
+            f'Hosting and translations (pending) with help from Dukt <{DUKT_INVITE}>'
         )
         await self.n()
         await self.stutter(
