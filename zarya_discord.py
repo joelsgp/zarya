@@ -246,14 +246,14 @@ class ZaryaGame:
             await self.stutter('You are not tired enough to get to sleep.')
 
     async def use_laptop(self):
-        if self.laptop.tutorial == 'Pending':
+        if self.laptop.tutorial == 'pending':
             await self.stutter('There is a sticker on the laptop that lists things you can do with it.')
             await self.stutterf('browse web')
             await self.stutterf('use messenger app')
             await self.stutterf('read files')
             await self.stutterf('play text game')
             await self.stutterf('control station module')
-            self.laptop.tutorial = 'Complete'
+            self.laptop.tutorial = 'done'
             await self.n()
         await self.stutter('You turn on the laptop.')
         self.laptop.state = 'On'
@@ -357,13 +357,14 @@ class ZaryaGame:
     #     await self.stutter('Hello there! Glad to see you got that malfunctioning hatch open.')
 
     # items
-    laptop = ZaryaItem(
+    class Laptop(ZaryaItem):
+        state = 'off'
+        tutorial = 'pending'
+        files = []
+    laptop = Laptop(
         name=STRS_ITEMS['laptop']['name'], desc=STRS_ITEMS['laptop']['desc'],
         can_use=True, can_take=False, usefunc=use_laptop
     )
-    laptop.state = 'off'
-    laptop.tutorial = 'Pending'
-    laptop.files = []
 
     paper = ZaryaItem(
         name=STRS_ITEMS['paper'], desc=STRS_ITEMS['paper']['desc'],
