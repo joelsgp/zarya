@@ -42,6 +42,7 @@ async def logs(ctx):
         await ctx.channel.send(file=file)
 
 
+# todo: fix the error every time an ingame command is used that isn't a bot command
 @client.command()
 async def play(ctx, *args):
     # only run with no args, to avoid crossover with in-game command

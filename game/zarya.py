@@ -7,6 +7,7 @@ from datetime import datetime
 # from tkinter import *
 
 
+# todo: update this to match the discord version?
 __version__ = '5.x.x'
 
 
