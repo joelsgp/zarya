@@ -698,7 +698,7 @@ class ZaryaGame:
                     if item_to_use in [i.name for i in itemspace]:
                         item = [i for i in itemspace if i.name == item_to_use][0]
                         if item.can_use:
-                            await item.usefunc()
+                            await item.usefunc(self)
                         else:
                             await self.stutter("That item isn't usable.")
                     else:
