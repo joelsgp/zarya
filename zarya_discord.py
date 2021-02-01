@@ -343,7 +343,7 @@ class ZaryaGame:
                                        "But it's ok, because you were already obliterated "
                                        'when its unshielded mass burnt up violently in the atmosphere.\n')
                     await self.stutters('GAME OVER')
-                    carry['on'] = False
+                    self.carry['on'] = False
                     await discord_input(self.discord_client, self.req_channel_name)
                     break
                 else:
@@ -422,7 +422,7 @@ class ZaryaGame:
 
     zvezda = ZaryaRoom(
         name=STRS_ROOMS['zvezda']['name'], desc=STRS_ROOMS['zvezda']['desc'],
-        can_leave=False, has_windows=True, items=[greenhouse, camera, toilet, bed], ports=zvezda_ports
+        can_leave=False, has_windows=True, items=[greenhouse, camera, toilet, bed]
     )
 
     # now all rooms are declared, assign cross-references
@@ -490,6 +490,8 @@ class ZaryaGame:
         'July', 'August', 'September', 'October', 'November', 'December'
     ]
 
+    carry = {'on': True}
+
     async def run(self):
         await self.stutterf(f'Zarya-Discord v{__version__} \n'
                             '© Joel McBride 2017, 2021 \n'
@@ -499,8 +501,7 @@ class ZaryaGame:
         await self.stutter("For a list of commands, type 'help'.")
 
         # command reader
-        carry = {'on': True}
-        while carry['on']:
+        while self.carry['on']:
             self.player.sleep += 1
             self.posix_time_ingame += 3600
             await self.n()
@@ -520,13 +521,15 @@ class ZaryaGame:
                 await self.stutterf(f'Zarya-Discord v{__version__}')
                 await self.stutterf('© Joel McBride 2017, 2021')
                 await self.stutterf("Remember to report any bugs or errors to 'JMcB#7918' - @ or DM me.")
-                await self.stutter('I made this game as one of my first reasonably large projects about four years ago '
-                              '(2016). It was very poorly coded but I worked quite a while on it, although after I '
-                              "finished most of the framework stuff I couldn't be bothered to add much more content. "
-                              "The writing, what there is, is ok, it's got some funny bits I guess. It's also very "
-                              'well researched, everything in the game is on the ISS in real life - including Zarya. '
-                              'Anyway, I had the idea recently (2021) to make a text based adventure game for Discord, '
-                              'so I went back to my old project, touched the code up a bit, ported it, and here we are.')
+                await self.stutter(
+                    'I made this game as one of my first reasonably large projects about four years ago '
+                    '(2016). It was very poorly coded but I worked quite a while on it, although after I '
+                    "finished most of the framework stuff I couldn't be bothered to add much more content. "
+                    "The writing, what there is, is ok, it's got some funny bits I guess. It's also very "
+                    'well researched, everything in the game is on the ISS in real life - including Zarya. '
+                    'Anyway, I had the idea recently (2021) to make a text based adventure game for Discord, '
+                    'so I went back to my old project, touched the code up a bit, ported it, and here we are.'
+                )
 
             # ignore bot-level commands
             elif command_input in ['logs', 'log', 'log.txt']:
@@ -564,7 +567,7 @@ class ZaryaGame:
                     self.previous_room = self.current_room
                     await self.stutter(f'You search the {container_to_search}.')
                     # TODO: shorten, maybe clean up
-                    self.current_room = next([container for container in self.current_room.containers if container.name == container_to_search])
+                    self.current_room = next([c for c in self.current_room.containers if c.name == container_to_search])
 
                     if self.current_room.items:
                         await self.stutter(f'The {container_to_search} contain(s):')
@@ -615,7 +618,7 @@ class ZaryaGame:
                     for item in self.current_room.items:
                         if item.can_take:
                             self.player.inventory.append(item)
-                            await self.stutter(f'Youo take the {item.name}.')
+                            await self.stutter(f'You take the {item.name}.')
                             # TODO: change this? editing in place is discouraged and may not work
                             self.current_room.items.remove(item)
                         else:
