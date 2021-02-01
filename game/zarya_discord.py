@@ -176,7 +176,7 @@ class ZaryaPlayer:
     def __str__(self):
         return self.name
 
-    def sleep(self, game_instance):
+    async def sleep(self, game_instance):
         """Sleep for a period of time determined by the sleepiness attribute."""
         if self.sleepiness > 8:
             await game_instance.stutter('You sleep until you are no longer tired.')
@@ -264,7 +264,7 @@ class ZaryaGame:
 
     async def use_bed(self):
         await self.stutter("You get in the 'bed'.")
-        self.player.sleep(self)
+        await self.player.sleep(self)
         await self.stutter('You get back out of the bed.')
 
     async def use_laptop(self):
@@ -551,7 +551,7 @@ class ZaryaGame:
             elif self.player.sleepiness >= 48:
                 await self.stutter("You start to nod off. Before you fall asleep you realise you haven't slept in "
                                    'about two days.')
-                self.player.sleep(self)
+                await self.player.sleep(self)
                 await self.stutter('You wake up floating around. You should have slept in your bed sooner.')
 
             await self.n()
