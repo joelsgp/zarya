@@ -8,7 +8,7 @@ import urllib.error
 from typing import List, Callable
 # from tkinter import *
 
-from discord_funcs import discord_input, discord_stutter
+from discord_funcs import discord_stutter, discord_input
 
 
 __version__ = '0.10.0'
