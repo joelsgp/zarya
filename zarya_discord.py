@@ -54,6 +54,23 @@ class ZaryaItem:
             self.usefunc = usefunc
 
 
+class Picture(ZaryaItem):
+    """Subclass to distinguish pictures from other items."""
+    def __init__(self, quality: int = None):
+        if quality is None:
+            quality = random.randint(1, 10)
+        self.quality = quality
+
+        if self.quality <= 2:
+            self.picture_adj = 'rubbish'
+        elif self.quality <= 5:
+            self.picture_adj = 'nice'
+        else:
+            self.picture_adj = 'beautiful'
+
+        super().__init__(name=f'{self.picture_adj} picture', desc=f'a {self.picture_adj} picture', can_take=True)
+
+
 # TODO: allow giving an identifier to the constructor to automatically get the name and desc from the strings file
 class ZaryaContainer:
     """Class for containers.
@@ -211,22 +228,14 @@ class ZaryaGame:
         await self.stutter('You watch the sprouts.')
         await self.stutters('Nothing interesting happens.')
 
-    # TODO: fix bug with KeyError taking the camera
-    # TODO: fix bug with using camera
     async def use_camera(self):
         if self.current_room.has_windows:
+            new_picture = Picture()
             await self.stutterl('You take the camera to a window and, after fiddling with '
                                 'lenses and settings for\na few minutes, take a ')
-            picture_quality = random.randint(1, 10)
-            if picture_quality <= 2:
-                picture_type = 'rubbish'
-            elif picture_quality <= 5:
-                picture_type = 'nice'
-            else:
-                picture_type = 'beautiful'
-            picture_name = f'{picture_type} picture'
-            await self.stutter(f'{picture_name}.')
-            self.player.inventory[picture_name] = picture_quality
+            await self.stutter(f'{new_picture.name}.')
+
+            self.player.inventory.append(new_picture)
         else:
             await self.stutter('There are no windows to take pictures out of in this module.')
 
@@ -247,11 +256,11 @@ class ZaryaGame:
     async def use_laptop(self):
         if self.laptop.tutorial == 'pending':
             await self.stutter('There is a sticker on the laptop that lists things you can do with it.')
-            await self.stutterf('browse web')
-            await self.stutterf('use messenger app')
-            await self.stutterf('read files')
-            await self.stutterf('play text game')
-            await self.stutterf('control station module')
+            await self.stutterf('browse web \n'
+                                'use messenger app \n'
+                                'read files \n'
+                                'play text game \n'
+                                'control station module')
             self.laptop.tutorial = 'done'
             await self.n()
         await self.stutter('You turn on the laptop.')
@@ -304,14 +313,18 @@ class ZaryaGame:
                         if contact in 'nasa social media team':
                             await self.stutter('You can send pictures to NASA to be posted online.')
                             await self.stutter('What picture would you like to send?')
-                            picture = await discord_input(self.discord_client, self.req_channel_name)
-                            self.log(picture)
-                            if 'picture' in picture:
-                                if picture in self.player.inventory:
+                            picture_to_send = await discord_input(self.discord_client, self.req_channel_name)
+                            self.log(picture_to_send)
+                            if 'picture' in picture_to_send:
+                                pictures_in_inv = [p for p in self.player.inventory if isinstance(p, Picture)]
+
+                                if picture_to_send in [p.name for p in pictures_in_inv]:
                                     await self.stutter('You send the picture.')
-                                    likes = self.player.inventory[picture] * random.randint(10, 1000)
-                                    await self.stutter('Your picture gets ' + str(likes) + ' likes.')
-                                    del self.player.inventory[picture]
+                                    picture = next([p for p in pictures_in_inv if p.name == picture_to_send])
+                                    likes = (picture.quality ** 2) * random.randint(10, 1000)
+                                    await self.stutter(f'Your picture gets {likes} likes.')
+                                    await self.stutter('You delete the picture to free up valuable storage space.')
+                                    self.player.inventory.remove(picture)
                                 else:
                                     await self.stutter("You don't have that picture.")
                             else:
