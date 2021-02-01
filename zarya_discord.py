@@ -75,7 +75,10 @@ class ZaryaContainer:
             desc = desc.removeprefix(self.desc_stem)
         self.desc = desc.strip()
         self.can_leave = can_leave
-        self.items = items
+        if items is None:
+            self.items = []
+        else:
+            self.items = items
 
 
 class ZaryaPort:
@@ -119,8 +122,14 @@ class ZaryaRoom(ZaryaContainer):
         super().__init__(name, desc, can_leave, items)
 
         self.has_windows = has_windows
-        self.containers = containers
-        self.ports = ports
+        if containers is None:
+            self.containers = []
+        else:
+            self.containers = containers
+        if ports is None:
+            self.ports = []
+        else:
+            self.ports = ports
 
     def __str__(self):
         return self.name
@@ -148,32 +157,6 @@ class ZaryaPlayer:
 
 
 class ZaryaGame:
-    skip = False
-
-    current_room = zarya
-    # TODO: change this somehow
-    previous_room = zarya
-    posix_time_ingame = 968716800
-
-    # list of commands for help
-    help_info = [
-        'help -Shows a list of commands',
-        'skip -Toggles stuttering off',
-        'noskip -Toggles stuttering on',
-        'setname -Changes your name. Legally binding',
-        'look around -Tells you what is in the room',
-        'show inventory -Tells you what is in your inventory',
-        'search [object] -Tells you what is in a container',
-        'take [item] -Puts an item in your inventory',
-        'take all -Puts all available items in your inventory',
-        'use [item] -Lets you exercise the functionality of an item',
-        'leave [place] -Lets you leave where you are',
-        'go through [direction] port -Travel into adjacent modules',
-        'drop [item] -Removes an item from your inventory',
-        'quit -Ends the game',
-        'Note:\n You can also use abbreviations for some commands.',
-    ]
-
     def __init__(self, discord_client, send_channel, req_channel_name=None):
         self.discord_client = discord_client
         self.send_channel = send_channel
@@ -427,18 +410,28 @@ class ZaryaGame:
     )
 
     # rooms
-    # TODO: fix these references
-    zarya_ports = [
+    zarya = ZaryaRoom(
+        name=STRS_ROOMS['zarya']['name'], desc=STRS_ROOMS['zarya']['desc'],
+        can_leave=False, items=[laptop], containers=[zarya_boxes]
+    )
+
+    unity = ZaryaRoom(
+        name=STRS_ROOMS['unity']['name'], desc=STRS_ROOMS['unity']['desc'],
+        can_leave=False
+    )
+
+    zvezda = ZaryaRoom(
+        name=STRS_ROOMS['zvezda']['name'], desc=STRS_ROOMS['zvezda']['desc'],
+        can_leave=False, has_windows=True, items=[greenhouse, camera, toilet, bed], ports=zvezda_ports
+    )
+
+    # now all rooms are declared, assign cross-references
+    zarya.ports = [
         ZaryaPort(name='front', is_open=True, room=unity),
         ZaryaPort('nadir'),
         ZaryaPort(name='aft', is_open=True, room=zvezda),
     ]
-    zarya = ZaryaRoom(
-        name=STRS_ROOMS['zarya']['name'], desc=STRS_ROOMS['zarya']['desc'],
-        can_leave=False, items=[laptop], containers=[zarya_boxes], ports=zarya_ports
-    )
-
-    unity_ports = [
+    unity.ports = [
         ZaryaPort('front'),
         ZaryaPort('nadir'),
         ZaryaPort('port'),
@@ -446,21 +439,12 @@ class ZaryaGame:
         ZaryaPort('starboard'),
         ZaryaPort(name='aft', is_open=True, room=zarya),
     ]
-    unity = ZaryaRoom(
-        name=STRS_ROOMS['unity']['name'], desc=STRS_ROOMS['unity']['desc'],
-        can_leave=False, ports=unity_ports
-    )
-
-    zvezda_ports = [
+    zvezda.ports = [
         ZaryaPort(name='front', is_open=True, room=zarya),
         ZaryaPort('nadir'),
         ZaryaPort('zenith'),
         ZaryaPort('aft'),
     ]
-    zvezda = ZaryaRoom(
-        name=STRS_ROOMS['zvezda']['name'], desc=STRS_ROOMS['zvezda']['desc'],
-        can_leave=False, has_windows=True, items=[greenhouse, camera, toilet, bed], ports=zvezda_ports
-    )
 
     # player
     player = ZaryaPlayer(
@@ -476,6 +460,30 @@ class ZaryaGame:
     #     for help_info_item in help_info:
     #         text.append(helpc.create_text(325, (i*20)+20, text=help_info_item))
 
+    skip = False
+
+    current_room = zarya
+    previous_room = zarya
+    posix_time_ingame = 968716800
+
+    # list of commands for help
+    help_info = [
+        'help -Shows a list of commands',
+        'skip -Toggles stuttering off',
+        'noskip -Toggles stuttering on',
+        'setname -Changes your name. Legally binding',
+        'look around -Tells you what is in the room',
+        'show inventory -Tells you what is in your inventory',
+        'search [object] -Tells you what is in a container',
+        'take [item] -Puts an item in your inventory',
+        'take all -Puts all available items in your inventory',
+        'use [item] -Lets you exercise the functionality of an item',
+        'leave [place] -Lets you leave where you are',
+        'go through [direction] port -Travel into adjacent modules',
+        'drop [item] -Removes an item from your inventory',
+        'quit -Ends the game',
+        'Note:\n You can also use abbreviations for some commands.',
+    ]
     # TODO: get this from some module instead?
     months = [
         'January', 'February', 'March', 'April', 'May', 'June',
@@ -502,8 +510,8 @@ class ZaryaGame:
             await self.n()
 
             if command_input in ['help', 'h']:
-                for help_info_item in self.help_info:
-                    await self.stutterf(help_info_item)
+                help_info_block = '\n'.join(self.help_info)
+                await self.stutterf(help_info_block)
                 await self.stutter('For the uninitiated: \n'
                                    'In text-based adventure games, a good first command when '
                                    "starting out or \nentering a new place is 'look around'.")
@@ -641,14 +649,13 @@ class ZaryaGame:
                 else:
                     await self.stutter("You don't have that item.")
 
-            elif 'drop' in command_input:
-                Item = command_input[5:]
-                if Item in self.player.inventory:
-                    await self.stutter('You drop the ' + Item + '.')
-                    Items = self.current_room['Items']
-                    Details = inventory[Item]
-                    Items[Item] = Details
-                    del inventory[Item]
+            elif command_input.startswith('drop'):
+                item_to_drop = command_input.removeprefix('drop').lstrip()
+                if item_to_drop in [item.name for item in self.player.inventory]:
+                    item = next([item for item in self.player.inventory if item.name == item_to_drop])
+                    await self.stutter(f'You drop the {item.name}.')
+                    self.current_room.items.append(item)
+                    self.player.inventory.remove(item)
                 else:
                     await self.stutter("That item isn't in your inventory.")
 
