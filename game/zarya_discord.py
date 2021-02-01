@@ -608,7 +608,7 @@ class ZaryaGame:
                 else:
                     await self.stutter('In your inventory is: ')
                     for inventory_item in self.player.inventory:
-                        await self.stutter(inventory_item.desc)
+                        await self.stutter(inventory_item.name)
 
             elif command_input.startswith('search'):
                 container_to_search = command_input.removeprefix('search').lstrip()
