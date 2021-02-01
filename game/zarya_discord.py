@@ -628,7 +628,7 @@ class ZaryaGame:
                 else:
                     await self.stutter("That isn't in here.")
 
-            elif command_input in ['leave'] or command_input.startswith(['leave']):
+            elif command_input in ('leave',) or command_input.startswith(('leave',)):
                 if self.current_room.can_leave:
                     await self.stutter(f'You leave the {self.current_room.name}.')
                     self.current_room = self.previous_room
@@ -676,6 +676,7 @@ class ZaryaGame:
                 else:
                     await self.stutter("There's nothing here.")
 
+            # todo: add `pick up` alias
             elif command_input.startswith('take'):
                 item_to_take = command_input.removeprefix('take').lstrip()
                 if item_to_take in [i.name for i in self.current_room.items]:
