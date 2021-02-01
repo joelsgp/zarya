@@ -13,9 +13,11 @@ from .discord_funcs import discord_stutter, discord_input
 
 # idea: dungeon crawler mode? https://discord.com/channels/714154158969716780/736664393630220289/805862557033299992
 # could make some bizarre plotline for it, aliens probably
+# todo: make more things in the strings file
+# todo: https://discord.com/channels/714154158969716780/736664393630220289/805872416521846795
 
 
-__version__ = '0.10.0'
+__version__ = '0.11.0'
 
 
 # need to make this dynamic
@@ -52,6 +54,9 @@ class ZaryaItem:
         self.can_take = can_take
         if self.can_use and usefunc is not None:
             self.usefunc = usefunc
+
+    def __str__(self):
+        return self.name
 
 
 class Picture(ZaryaItem):
@@ -202,6 +207,11 @@ class ZaryaGame:
         else:
             self.req_channel_name = req_channel_name
 
+        self.carry = {'on': True}
+        self.skip = False
+        # 12 sep 2000
+        self.posix_time_ingame = 968716800
+
     # newline function from old version - redundant now
     async def n(self):
         await discord_stutter('', channel=self.send_channel, skip=True)
@@ -252,6 +262,7 @@ class ZaryaGame:
         await self.stutters('Nothing interesting happens.')
 
     async def use_camera(self):
+        # TODO; more detailed pictures e.g. what the picture is of?
         if self.current_room.has_windows:
             new_picture = Picture()
             await self.stutterl('You take the camera to a window and, after fiddling with '
@@ -296,7 +307,7 @@ class ZaryaGame:
                 await self.stutter('You turn off the laptop.')
                 self.laptop.powered_on = False
 
-            if task in ['h', 'help', 'tutorial', 'redo tutorial', 'sticker', 'put sticker back on']:
+            elif task in ['h', 'help', 'tutorial', 'redo tutorial', 'sticker', 'put sticker back on']:
                 self.laptop.tutorial_done = False
                 await self.stutter(
                     'You decide to stick the sticker that lists what you can do with the laptop '
@@ -314,7 +325,6 @@ class ZaryaGame:
                     # todo: accept urls without the https://
                     response = urllib.request.urlopen(url)
                     html = response.read()
-                    # todo: fix
                     await self.stutter(html, skip=True)
                     await self.stutter("Hmm, looks like there's no GUI. \n"
                                        'Oh well.')
@@ -341,13 +351,16 @@ class ZaryaGame:
                 self.log(contact)
                 if contact in contacts:
                     if contact in 'nasa social media team':
+                        pictures_in_inv = [p for p in self.player.inventory if isinstance(p, Picture)]
+                        pictures_list = ' \n'.join([p.name for p in pictures_in_inv])
+
                         await self.stutter('You can send pictures to NASA to be posted online. \n'
-                                           'What picture would you like to send?')
+                                           'What picture would you like to send? \n'
+                                           f"{pictures_list}")
                         picture_to_send = await discord_input(self.discord_client, self.req_channel_name)
                         self.log(picture_to_send)
-                        if 'picture' in picture_to_send:
-                            pictures_in_inv = [p for p in self.player.inventory if isinstance(p, Picture)]
 
+                        if 'picture' in picture_to_send:
                             if picture_to_send in [p.name for p in pictures_in_inv]:
                                 await self.stutter('You send the picture.')
                                 picture = [p for p in pictures_in_inv if p.name == picture_to_send][0]
@@ -362,7 +375,6 @@ class ZaryaGame:
                 else:
                     await self.stutter("They aren't in your contacts list.")
 
-            # todo: fix
             elif task in 'play text game':
                 await ZaryaGame(self.discord_client, self.send_channel, self.req_channel_name).run()
 
@@ -392,6 +404,7 @@ class ZaryaGame:
                                            'when its unshielded mass burnt up violently in the atmosphere.\n')
                         await self.stutters('GAME OVER')
                         self.carry['on'] = False
+                        break
                     else:
                         await self.stutter('You chicken out. Chicken. (chicken go cluck cluck)')
                 else:
@@ -505,11 +518,8 @@ class ZaryaGame:
     #     for help_info_item in help_info:
     #         text.append(helpc.create_text(325, (i*20)+20, text=help_info_item))
 
-    skip = False
-
     current_room = zarya
     previous_room = zarya
-    posix_time_ingame = 968716800
 
     # list of commands for help
     help_info = [
@@ -530,12 +540,10 @@ class ZaryaGame:
         'Note:\n You can also use abbreviations for some commands.',
     ]
     # TODO: get this from some module instead?
-    months = [
+    months = (
         'January', 'February', 'March', 'April', 'May', 'June',
         'July', 'August', 'September', 'October', 'November', 'December'
-    ]
-
-    carry = {'on': True}
+    )
 
     async def run(self):
         await self.stutterf(f'Zarya-Discord v{__version__} \n'
@@ -594,22 +602,26 @@ class ZaryaGame:
                 pass
 
             elif command_input in ['quit', 'q']:
-                await self.stutter('Thanks for playing!', self.send_channel)
-                break
+                self.carry['on'] = False
 
-            # todo: fix rate limiting on ports list
             elif command_input in ['look around', 'look', 'la', 'l']:
+                # todo: more detailed info on windows
+                # todo: tell user where the ports lead?
                 await self.stutter(f'{self.current_room.desc_stem.rstrip()} {self.current_room.desc}.')
+                if self.current_room.has_windows:
+                    await self.stutter('There are windows.')
 
                 if self.current_room.items:
-                    for item in self.current_room.items:
-                        await self.stutter(f'{item.desc_stem.rstrip()} {item.desc}')
+                    item_descs = [f'{i.desc_stem.rstrip()} {i.desc}.' for i in self.current_room.items]
+                    await self.stutter(' \n'.join(item_descs))
 
                 if self.current_room.ports:
-                    await self.stutter(f'There are {len(self.current_room.ports)} ports: ')
+                    ports_list = f'There are {len(self.current_room.ports)} ports:'
                     for port in self.current_room.ports:
                         port_state = 'open' if port.is_open else 'closed'
-                        await self.stutter(f'One to {port.name} that is {port_state}.')
+                        ports_list += f' \nOne to {port.name} that is {port_state}.'
+
+                    await self.stutter(ports_list)
 
             elif command_input in ['show inventory', 'inventory', 'si', 'i']:
                 if not self.player.inventory:
@@ -688,19 +700,22 @@ class ZaryaGame:
                 else:
                     await self.stutter("There's nothing here.")
 
-            # todo: add `pick up` alias
-            elif command_input.startswith('take'):
-                item_to_take = command_input.removeprefix('take').lstrip()
-                if item_to_take in [i.name for i in self.current_room.items]:
-                    item = [i for i in self.current_room.items if i.name == item_to_take][0]
-                    if item.can_take:
-                        await self.stutter(f'You take the {item.name}.')
-                        self.player.inventory.append(item)
-                        self.current_room.items.remove(item)
-                    else:
-                        await self.stutter("You can't take that.")
-                else:
-                    await self.stutter("That item isn't here.")
+            elif command_input.startswith(('take', 'pick up')):
+                for prefix in ('take', 'pick up'):
+                    if command_input.startswith(prefix):
+                        item_to_take = command_input.removeprefix(prefix).lstrip()
+
+                        if item_to_take in [i.name for i in self.current_room.items]:
+                            item = [i for i in self.current_room.items if i.name == item_to_take][0]
+                            if item.can_take:
+                                await self.stutter(f'You take the {item.name}.')
+                                self.player.inventory.append(item)
+                                self.current_room.items.remove(item)
+                            else:
+                                await self.stutter("You can't take that.")
+                        else:
+                            await self.stutter("That item isn't here.")
+                        break
 
             elif command_input.startswith('use'):
                 item_to_use = command_input.removeprefix('use').lstrip()
@@ -744,6 +759,9 @@ class ZaryaGame:
 
             else:
                 await self.stutter("That's not a valid command.")
+
+        # end of run() method
+        await self.stutter('Thanks for playing!')
 
     # logging
     @staticmethod

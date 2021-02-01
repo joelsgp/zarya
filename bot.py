@@ -43,11 +43,16 @@ async def logs(ctx):
 
 
 @client.command()
-async def play(ctx):
+async def play(ctx, *args):
+    # only run with no args, to avoid crossover with in-game command
+    if args:
+        return
+    # todo: make instancing better
     # game_instance = zarya_discord.ZaryaGame(client, ctx.channel, settings['discord']['channel'])
     game_instance = zarya_discord.ZaryaGame(client, ctx.channel, ctx.channel.name)
     game_instance.log_start()
     await game_instance.run()
+    del game_instance
 
 
 if __name__ == '__main__':

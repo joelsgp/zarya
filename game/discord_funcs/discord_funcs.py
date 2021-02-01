@@ -6,7 +6,7 @@ import random
 # TODO: create strings file, csv parser for translations, lang setting in settings
 # TODO: add func to change persistent settings
 
-
+DISCORD_MESSAGE_LEN_LIMIT = 2000
 PREFIXES = (
     '>', '> ',
     '9v', '9v ',
@@ -28,8 +28,16 @@ async def discord_stutter(text, channel, delay=lambda: random.randint(1, 3)/100,
     if skip:
         await channel.send(text)
     else:
-        # part_len = len(text) // 5
-        part_len = 100
+        # recurse to send the message in parts if it's over the message length limits
+        if len(text) > DISCORD_MESSAGE_LEN_LIMIT:
+            part_len = DISCORD_MESSAGE_LEN_LIMIT
+            parts = [text[i:i + part_len] for i in range(0, len(text), part_len)]
+            for part in parts:
+                await discord_stutter(part, channel, delay, skip)
+        if len(text) > 500:
+            part_len = len(text) // 5
+        else:
+            part_len = 100
         parts = [text[i:i+part_len] for i in range(0, len(text), part_len)]
 
         message = await channel.send(parts[0])
