@@ -8,6 +8,9 @@ import discord.ext.commands
 
 import game.zarya_discord as zarya_discord
 
+
+# todo: update readme
+
 # Add links:
 # Send Messages; Attach Files:
 # https://discord.com/api/oauth2/authorize?client_id=799634237355065395&permissions=34816&scope=bot
