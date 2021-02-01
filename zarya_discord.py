@@ -15,6 +15,7 @@ __version__ = '0.1.0'
 
 
 # TODO: more comprehensive refactor, oop etc.
+# TODO: combine discord_print() calls to help with rate limiting
 
 
 # need to make this dynamic
@@ -212,8 +213,6 @@ class ZaryaGame:
 
     # TODO: fix bug with KeyError taking the camera
     # TODO: fix bug with using camera
-    # TODO: combine string literals to help with rate limiting
-    # TODO: move todos into relevant places :p
     async def use_camera(self):
         if self.current_room.has_windows:
             await self.stutterl('You take the camera to a window and, after fiddling with '
@@ -672,11 +671,12 @@ class ZaryaGame:
                 self.skip = False
                 await self.stutter('Text will now output gradually.')
 
-            # TODO: allow just 'name' as invocation?
-            elif command_input.startswith('setname'):
-                new_name = command_input.removeprefix('setname').lstrip()
-                self.player.name = new_name
-                await self.stutter(f"Your name is {self.player.name}.")
+            elif command_input.startswith(('name', 'setname', 'my name is')):
+                for command_invoc in ('name', 'setname', 'my name is'):
+                    if command_input.startswith(command_invoc):
+                        new_name = command_input.removeprefix(command_invoc).lstrip()
+                        self.player.name = new_name
+                        await self.stutter(f'Your name is {self.player.name}.')
 
             else:
                 await self.stutter("That's not a valid command.")
