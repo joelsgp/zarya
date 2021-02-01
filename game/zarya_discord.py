@@ -399,7 +399,7 @@ class ZaryaGame:
     # items
     laptop = Laptop(
         name=STRS_ITEMS['laptop']['name'], desc=STRS_ITEMS['laptop']['desc'],
-        can_use=True, can_take=False, usefunc=use_laptop
+        can_use=True, can_take=True, usefunc=use_laptop
     )
 
     paper = ZaryaItem(
@@ -590,7 +590,7 @@ class ZaryaGame:
                 break
 
             elif command_input in ['look around', 'look', 'la', 'l']:
-                await self.stutter(f'{self.current_room.desc_stem.rstrip()} {self.current_room.desc}')
+                await self.stutter(f'{self.current_room.desc_stem.rstrip()} {self.current_room.desc}.')
 
                 if self.current_room.items:
                     for item in self.current_room.items:
