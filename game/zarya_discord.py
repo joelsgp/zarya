@@ -11,6 +11,10 @@ from typing import List, Callable
 from .discord_funcs import discord_stutter, discord_input
 
 
+# idea: dungeon crawler mode? https://discord.com/channels/714154158969716780/736664393630220289/805862557033299992
+# could make some bizarre plotline for it, aliens probably
+
+
 __version__ = '0.10.0'
 
 
@@ -301,14 +305,16 @@ class ZaryaGame:
                     'You think this is pretty stupid.'
                 )
 
-            elif task in ['browse web', 'browse', 'web']:
+            elif task in ['browse the web', 'browse web', 'browse', 'web']:
                 await self.stutter('A browser window opens. Where do you want to go?')
                 url = await discord_input(self.discord_client, self.req_channel_name)
                 self.log(url)
                 try:
+                    # todo: accept urls without the https://
                     response = urllib.request.urlopen(url)
                     html = response.read()
-                    print(html)
+                    # todo: fix
+                    await self.stutter(html, skip=True)
                     await self.stutter("Hmm, looks like there's no GUI. \n"
                                        'Oh well.')
                 except ValueError:
@@ -701,8 +707,9 @@ class ZaryaGame:
                             await item.usefunc(self)
                         else:
                             await self.stutter("That item isn't usable.")
-                    else:
-                        await self.stutter("You don't have that item.")
+                        break
+                else:
+                    await self.stutter("You don't have that item.")
 
             elif command_input.startswith('drop'):
                 item_to_drop = command_input.removeprefix('drop').lstrip()
