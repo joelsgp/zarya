@@ -8,43 +8,43 @@
       "desc_stem": "There is",
 
       "laptop": {
-        "name": "Laptop",
+        "name": "laptop",
         "desc": "a laptop on the wall"
       },
 
       "paper": {
-        "name": "Paper",
+        "name": "paper",
         "desc": "a strip of paper"
       },
 
       "drive": {
-        "name": "Drive",
+        "name": "drive",
         "desc": "a USB stick"
       },
 
       "jumpsuit": {
-        "name": "Jumpsuit",
+        "name": "jumpsuit",
         "desc": "a blue jumpsuit with the flag of the glorious soviet union, I mean, Russia, on it"
       },
 
       "greenhouse": {
-        "name": "Lada",
+        "name": "lada",
         "proper_name": "Lada",
         "desc": "a little greenhouse thing with sprouts growing in it"
       },
 
       "camera": {
-        "name": "Camera",
+        "name": "camera",
         "desc": "a laptop on the wall"
       },
 
       "toilet": {
-        "name": "Space Toilet",
+        "name": "space toilet",
         "desc": "a bogstandard space toilet in a little cubicle. Pun intended"
       },
 
       "bed": {
-        "name": "Sleeping Bag",
+        "name": "sleeping bag",
         "desc": "a simple sleeping bag strapped securely to a wall"
       }
     },
@@ -53,7 +53,7 @@
       "desc_stem": "You are",
 
       "zarya_boxes": {
-        "name": "Containers",
+        "name": "containers",
         "desc": "looking in the containers lining the walls"
       }
     },
@@ -62,26 +62,27 @@
       "desc_stem": "You are",
 
       "zarya": {
-        "name": "Zarya",
+        "name": "zarya",
         "proper_name": "Zarya",
         "desc": "in a bland white module, what may sometimes be considered the walls lined with storage containers"
       },
 
       "unity": {
-        "name": "Unity",
+        "name": "unity",
         "proper_name": "Unity",
         "desc": "in one of the nodes that links part of the station"
       },
 
       "zvezda": {
-        "name": "Zvezda",
+        "name": "zvezda",
         "proper_name": "Zvezda",
         "desc": "in a three-part service module, with a spherical 'Transfer Compartment' to the front, a 'Work Compartment' with living quarters and life support, where things are done, and to aft a 'Transfer Chamber'"
       }
     },
 
     "player": {
-      "name_default": "Player"
+      "name_default": "player",
+      "proper_name_default": "Player"
     },
 
     "actions": {
