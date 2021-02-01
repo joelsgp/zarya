@@ -2,11 +2,11 @@ import os
 import json
 import time
 import random
-import urllib.request
-import urllib.error
 
 from typing import List, Callable
 # from tkinter import *
+
+import aiohttp
 
 from .discord_funcs import discord_stutter, discord_input
 
@@ -322,16 +322,14 @@ class ZaryaGame:
                 url = await discord_input(self.discord_client, self.req_channel_name)
                 self.log(url)
                 try:
-                    # todo: accept urls without the https://
-                    response = urllib.request.urlopen(url)
-                    html = response.read()
+                    async with aiohttp.ClientSession() as session:
+                        async with session.get(url) as response:
+                            html = await response.text()
                     await self.stutter(html, skip=True)
                     await self.stutter("Hmm, looks like there's no GUI. \n"
                                        'Oh well.')
                 except ValueError:
                     await self.stutter("That's not a valid URL.")
-                except urllib.error.URLError:
-                    await self.stutter('You have no internet connection.')
 
             elif task in ['read files', 'read', 'files']:
                 if not self.laptop.files:
@@ -546,12 +544,18 @@ class ZaryaGame:
     )
 
     async def run(self):
-        await self.stutterf(f'Zarya-Discord v{__version__} \n'
-                            '© Joel McBride 2017, 2021 \n'
-                            "Remember to report any bugs or errors to 'JMcB#7918' - @ or DM me.")
+        await self.stutterf(
+            f'Zarya-Discord v{__version__} \n'
+            '© Joel McBride 2017, 2021 \n'
+            "Remember to report any bugs or errors to 'JMcB#7918' - @ or DM me. \n"
+            # todo: change once translations are available
+            'Hosting and translations (pending) with help from Dukt <https://discord.gg/UAe4fB7EHZ>'
+        )
         await self.n()
-        await self.stutter(f"Date: {time.strftime('%d.%m.%Y', time.gmtime(self.posix_time_ingame))} \n"
-                           "For a list of commands, type 'help'.")
+        await self.stutter(
+            f"Date: {time.strftime('%d.%m.%Y', time.gmtime(self.posix_time_ingame))} \n"
+            "For a list of commands, type 'help'."
+        )
 
         # command reader
         while self.carry['on']:
@@ -576,6 +580,7 @@ class ZaryaGame:
             self.log(command_input)
             await self.n()
 
+            # todo: fix help command duplication
             if command_input in ['help', 'h', 'commands']:
                 help_info_block = '\n'.join(self.help_info)
                 await self.stutterf(help_info_block)
@@ -584,9 +589,11 @@ class ZaryaGame:
                                    "starting out or \nentering a new place is 'look around'.")
 
             elif command_input in ['info', 'background', 'b']:
-                await self.stutterf(f'Zarya-Discord v{__version__}')
-                await self.stutterf('© Joel McBride 2017, 2021')
-                await self.stutterf("Remember to report any bugs or errors to 'JMcB#7918' - @ or DM me.")
+                await self.stutterf(
+                    f'Zarya-Discord v{__version__}'
+                    '© Joel McBride 2017, 2021'
+                    "Remember to report any bugs or errors to 'JMcB#7918' - @ or DM me."
+                )
                 await self.stutter(
                     'I made this game as one of my first reasonably large projects about four years ago '
                     '(2016). It was very poorly coded but I worked quite a while on it, although after I '

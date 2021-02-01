@@ -25,15 +25,17 @@ async def discord_stutter(text, channel, delay=lambda: random.randint(1, 3)/100,
     if not text:
         return
 
+    # recurse to send the message in parts if it's over the message length limits
+    if len(text) > DISCORD_MESSAGE_LEN_LIMIT:
+        part_len = DISCORD_MESSAGE_LEN_LIMIT
+        parts = [text[i:i + part_len] for i in range(0, len(text), part_len)]
+        for part in parts:
+            await discord_stutter(part, channel, delay, skip)
+        return
+
     if skip:
         await channel.send(text)
     else:
-        # recurse to send the message in parts if it's over the message length limits
-        if len(text) > DISCORD_MESSAGE_LEN_LIMIT:
-            part_len = DISCORD_MESSAGE_LEN_LIMIT
-            parts = [text[i:i + part_len] for i in range(0, len(text), part_len)]
-            for part in parts:
-                await discord_stutter(part, channel, delay, skip)
         if len(text) > 500:
             part_len = len(text) // 5
         else:
