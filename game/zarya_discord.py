@@ -305,6 +305,7 @@ class ZaryaGame:
                     'You think this is pretty stupid.'
                 )
 
+            # todo: puzzle for connecting to the internet?
             elif task in ['browse the web', 'browse web', 'browse', 'web']:
                 await self.stutter('A browser window opens. Where do you want to go?')
                 url = await discord_input(self.discord_client, self.req_channel_name)
@@ -549,12 +550,12 @@ class ZaryaGame:
             # one hour
             self.posix_time_ingame += 60 ** 3
             # could check at like 8 as well but don't want to bother the player, it's not an educational game
-            if self.player.sleepiness >= 24:
+            if self.player.sleepiness == 24:
                 await self.stutter("You haven't slept for a while. You're starting to feel very sleepy.")
-            elif self.player.sleepiness >= 40:
+            elif self.player.sleepiness == 40:
                 await self.stutter("You haven't slept in too long. "
                                    "You're very, very tired and you're going to black out soon.")
-            elif self.player.sleepiness >= 48:
+            elif self.player.sleepiness == 48:
                 await self.stutter("You start to nod off. Before you fall asleep you realise you haven't slept in "
                                    'about two days.')
                 await self.player.sleep(self)
@@ -615,6 +616,9 @@ class ZaryaGame:
                     await self.stutter('In your inventory is: ')
                     for inventory_item in self.player.inventory:
                         await self.stutter(inventory_item.name)
+
+            elif command_input == 'BUYBURGER':
+                await self.stutter('BURGER. 🍔 MMM...')
 
             elif command_input.startswith('search'):
                 container_to_search = command_input.removeprefix('search').lstrip()
