@@ -38,7 +38,7 @@ async def on_ready():
 
 @client.command(aliases=['github'])
 async def git(ctx):
-    await ctx.channel.send(GITHUB_URL)
+    await ctx.channel.send(f'<{GITHUB_URL}>')
 
 
 @client.command(aliases=['log', 'log.txt'])
