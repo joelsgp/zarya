@@ -334,7 +334,7 @@ class ZaryaGame:
 
                             if picture_to_send in [p.name for p in pictures_in_inv]:
                                 await self.stutter('You send the picture.')
-                                picture = next([p for p in pictures_in_inv if p.name == picture_to_send])
+                                picture = [p for p in pictures_in_inv if p.name == picture_to_send][0]
                                 likes = (picture.quality ** 2) * random.randint(10, 1000)
                                 await self.stutter(f'Your picture gets {likes} likes.')
                                 await self.stutter('You delete the picture to free up valuable storage space.')
@@ -601,8 +601,8 @@ class ZaryaGame:
                 if container_to_search in [container.name for container in self.current_room.containers]:
                     self.previous_room = self.current_room
                     await self.stutter(f'You search the {container_to_search}.')
-                    # TODO: shorten, maybe clean up
-                    self.current_room = next([c for c in self.current_room.containers if c.name == container_to_search])
+                    # todo: make this kind of functionality a method of the room and the player's inventory.
+                    self.current_room = [c for c in self.current_room.containers if c.name == container_to_search][0]
 
                     if self.current_room.items:
                         await self.stutter(f'The {container_to_search} contain(s):')
@@ -634,7 +634,7 @@ class ZaryaGame:
                         break
 
                 if direction in [port.name for port in self.current_room.ports]:
-                    target_port = next([port for port in self.current_room.ports if port.name == direction])
+                    target_port = [p for p in self.current_room.ports if p.name == direction][0]
                     if target_port.is_open:
                         await self.stutter(f'You go through the port into {target_port.room.name}.')
                         self.current_room = target_port.room
@@ -663,8 +663,8 @@ class ZaryaGame:
 
             elif command_input.startswith('take'):
                 item_to_take = command_input.removeprefix('take').lstrip()
-                if item_to_take in [item.name for item in self.current_room.items]:
-                    item = next([item for item in self.current_room.items if item.name == item_to_take])
+                if item_to_take in [i.name for i in self.current_room.items]:
+                    item = [i for i in self.current_room.items if i.name == item_to_take][0]
                     if item.can_take:
                         await self.stutter(f'You take the {item.name}.')
                         self.player.inventory.append(item)
@@ -679,8 +679,8 @@ class ZaryaGame:
 
                 # TODO: reduce duplicated code (the bit with a listcomp)
                 for itemspace in (self.player.inventory, self.current_room.items):
-                    if item_to_use in [item.name for item in itemspace]:
-                        item = next([item for item in itemspace if item.name == item_to_use])
+                    if item_to_use in [i.name for i in itemspace]:
+                        item = [i for i in itemspace if i.name == item_to_use][0]
                         if item.can_use:
                             await item.usefunc()
                         else:
@@ -691,7 +691,7 @@ class ZaryaGame:
             elif command_input.startswith('drop'):
                 item_to_drop = command_input.removeprefix('drop').lstrip()
                 if item_to_drop in [item.name for item in self.player.inventory]:
-                    item = next([item for item in self.player.inventory if item.name == item_to_drop])
+                    item = [i for i in self.player.inventory if i.name == item_to_drop][0]
                     await self.stutter(f'You drop the {item.name}.')
                     self.current_room.items.append(item)
                     self.player.inventory.remove(item)
