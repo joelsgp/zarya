@@ -71,6 +71,13 @@ class Picture(ZaryaItem):
         super().__init__(name=f'{self.picture_adj} picture', desc=f'a {self.picture_adj} picture', can_take=True)
 
 
+class Laptop(ZaryaItem):
+    """Subclass for the laptop item, with additional attributes."""
+    powered_on = False
+    tutorial_done = False
+    files = []
+
+
 # TODO: allow giving an identifier to the constructor to automatically get the name and desc from the strings file
 class ZaryaContainer:
     """Class for containers.
@@ -160,18 +167,30 @@ class ZaryaPlayer:
         name
         inventory --  a list of ZaryaItem's
         wearing -- outfit
-        sleep -- how much sleep as a float
+        sleepiness -- how much sleep as a float
     """
     name = STRS_GAME['player']['name_default']
 
-    def __init__(self, name: str, inventory: List[ZaryaItem], wearing, sleep: float = 5):
+    def __init__(self, name: str, inventory: List[ZaryaItem], wearing, sleepiness: float = 5):
         self.name = name
         self.inventory = inventory
         self.wearing = wearing
-        self.sleep = sleep
+        self.sleepiness = sleepiness
 
     def __str__(self):
         return self.name
+
+    def sleep(self, game_instance):
+        """Sleep for a period of time determined by the sleepiness attribute."""
+        if self.sleepiness > 8:
+            await game_instance.stutter('You sleep until you are no longer tired.')
+            game_instance.posix_time_ingame += self.sleepiness * 3600
+            self.sleepiness = random.randint(0, 2)
+            await game_instance.stutter(
+                f"Date: {time.strftime('%d.%m.%Y', time.gmtime(game_instance.posix_time_ingame))}"
+            )
+        else:
+            await game_instance.stutter('You are not tired enough to get to sleep.')
 
 
 class ZaryaGame:
@@ -202,21 +221,25 @@ class ZaryaGame:
 
     # item use subroutines
     async def use_paper(self):
-        await self.stutter('The strip of paper has a password on it.')
-        await self.stutter("'Pa$$word123'")
-        await self.stutter('You wonder what it is the password to.')
-        await self.stutter("(That's your cue to wonder what it is the password to)")
+        # note: what was this meant to be used for?
+        await self.stutter('The strip of paper has a password on it. \n'
+                           "'Pa$$word123' \n"
+                           'You wonder what it is the password to. \n'
+                           "(That's your cue to wonder what it is the password to)")
 
     async def use_drive(self):
-        if 'laptop' in self.player.inventory or 'laptop' in self.current_room.items:
-            if self.drive.files:
-                await self.stutter('You transfer all the files on the usb stick to the laptop.')
-                self.laptop.files = self.drive.files
-                self.drive.files = []
+        for itemspace in self.player.inventory, self.current_room.items:
+            laptop_in_itemspace = [i for i in itemspace if isinstance(i, Laptop)]
+            if laptop_in_itemspace:
+                laptop = laptop_in_itemspace[0]
+                if self.drive.files:
+                    await self.stutter('You transfer all the files on the usb stick to the laptop.')
+                    laptop.files = self.drive.files
+                    self.drive.files = []
+                else:
+                    await self.stutter('There are no files on the usb stick.')
             else:
-                await self.stutter('There are no files on the usb stick.')
-        else:
-            await self.stutter('You have to laptop to use it with.')
+                await self.stutter('You have no laptop to use it with.')
 
     async def use_jumpsuit(self):
         await self.stutter('You put on the jumpsuit.')
@@ -243,29 +266,28 @@ class ZaryaGame:
         await self.stutter("You do your business in the space toilet. Don't ask an astronaut "
                            "how this \nhappens if you meet one, they're tired of the question.")
 
+    # todo: make the player fall asleep if sleepiness reaches 48. also give a warning at 40
     async def use_bed(self):
         await self.stutter("You get in the 'bed'.")
-        if self.player.sleep > 8:
-            await self.stutter('You sleep until you are no longer tired.')
-            self.posix_time_ingame += self.player.sleep * 3600
-            self.player.sleep = 0
-            await self.stutter(f"Date: {time.strftime('%d.%m.%Y', time.gmtime(self.posix_time_ingame))}")
-        else:
-            await self.stutter('You are not tired enough to get to sleep.')
+        self.player.sleep(self)
+        await self.stutter('You get back out of the bed.')
 
     async def use_laptop(self):
-        if self.laptop.tutorial == 'pending':
+        # tutorial
+        if not self.laptop.tutorial_done:
             await self.stutter('There is a sticker on the laptop that lists things you can do with it.')
             await self.stutterf('browse web \n'
                                 'use messenger app \n'
                                 'read files \n'
                                 'play text game \n'
                                 'control station module')
-            self.laptop.tutorial = 'done'
+            self.laptop.tutorial_done = True
             await self.n()
+
+        # todo: add option to redo tutorial
         await self.stutter('You turn on the laptop.')
-        self.laptop.state = 'On'
-        while self.laptop.state == 'On':
+        self.laptop.powered_on = True
+        while self.laptop.powered_on:
             await self.n()
             task = await discord_input(self.discord_client, self.req_channel_name)
             self.log(task)
@@ -273,7 +295,7 @@ class ZaryaGame:
 
             if task in 'turn off laptop':
                 await self.stutter('You turn off the laptop.')
-                self.laptop.state = 'Off'
+                self.laptop.powered_on = False
 
             elif task in ['browse web', 'browse', 'web']:
                 await self.stutter('A browser window opens. Where do you want to go?')
@@ -283,8 +305,8 @@ class ZaryaGame:
                     response = urllib.request.urlopen(url)
                     html = response.read()
                     print(html)
-                    await self.stutter("Hmm, looks like there's no GUI.")
-                    await self.stutter('Oh well.')
+                    await self.stutter("Hmm, looks like there's no GUI. \n"
+                                       'Oh well.')
                 except ValueError:
                     await self.stutter("That's not a valid URL.")
                 except urllib.error.URLError:
@@ -304,33 +326,30 @@ class ZaryaGame:
                     await self.stutterf(contact)
 
                 await self.stutter('Who would you like to message?')
-                invalid_input = True
-                while invalid_input:
-                    contact = await discord_input(self.discord_client, self.req_channel_name)
-                    self.log(contact)
-                    if contact in contacts:
-                        invalid_input = False
-                        if contact in 'nasa social media team':
-                            await self.stutter('You can send pictures to NASA to be posted online.')
-                            await self.stutter('What picture would you like to send?')
-                            picture_to_send = await discord_input(self.discord_client, self.req_channel_name)
-                            self.log(picture_to_send)
-                            if 'picture' in picture_to_send:
-                                pictures_in_inv = [p for p in self.player.inventory if isinstance(p, Picture)]
+                contact = await discord_input(self.discord_client, self.req_channel_name)
+                self.log(contact)
+                if contact in contacts:
+                    if contact in 'nasa social media team':
+                        await self.stutter('You can send pictures to NASA to be posted online. \n'
+                                           'What picture would you like to send?')
+                        picture_to_send = await discord_input(self.discord_client, self.req_channel_name)
+                        self.log(picture_to_send)
+                        if 'picture' in picture_to_send:
+                            pictures_in_inv = [p for p in self.player.inventory if isinstance(p, Picture)]
 
-                                if picture_to_send in [p.name for p in pictures_in_inv]:
-                                    await self.stutter('You send the picture.')
-                                    picture = next([p for p in pictures_in_inv if p.name == picture_to_send])
-                                    likes = (picture.quality ** 2) * random.randint(10, 1000)
-                                    await self.stutter(f'Your picture gets {likes} likes.')
-                                    await self.stutter('You delete the picture to free up valuable storage space.')
-                                    self.player.inventory.remove(picture)
-                                else:
-                                    await self.stutter("You don't have that picture.")
+                            if picture_to_send in [p.name for p in pictures_in_inv]:
+                                await self.stutter('You send the picture.')
+                                picture = next([p for p in pictures_in_inv if p.name == picture_to_send])
+                                likes = (picture.quality ** 2) * random.randint(10, 1000)
+                                await self.stutter(f'Your picture gets {likes} likes.')
+                                await self.stutter('You delete the picture to free up valuable storage space.')
+                                self.player.inventory.remove(picture)
                             else:
-                                await self.stutter("That's not a picture!")
-                    else:
-                        await self.stutter("They aren't in your contacts list.")
+                                await self.stutter("You don't have that picture.")
+                        else:
+                            await self.stutter("That's not a picture!")
+                else:
+                    await self.stutter("They aren't in your contacts list.")
 
             elif task in 'play text game':
                 await ZaryaGame(self.discord_client, self.send_channel, self.req_channel_name).run()
@@ -344,10 +363,11 @@ class ZaryaGame:
                                    'thruster statuses: nominal\n'
                                    'alignment: retrograde\n'
                                    "There is a button that says 'fire main engines'.\n"
-                                   'Would you like to press it?')
+                                   'Would you like to press it? (yes/no)')
                 choice = await discord_input(self.discord_client, self.req_channel_name)
                 self.log(choice)
-                if 'yes' in choice:
+                if choice == 'yes':
+                    # todo: add confirmation
                     await self.stutter('You press the button and tons of Gs force you against the back of the module.\n'
                                        "This is a cargo module, which means there's no seat to help you.\n"
                                        'Your orbit is rapidly falling deeper into the atmosphere.\n'
@@ -356,8 +376,6 @@ class ZaryaGame:
                                        'when its unshielded mass burnt up violently in the atmosphere.\n')
                     await self.stutters('GAME OVER')
                     self.carry['on'] = False
-                    await discord_input(self.discord_client, self.req_channel_name)
-                    break
                 else:
                     await self.stutter('That was probably a sensible choice.')
 
@@ -369,10 +387,6 @@ class ZaryaGame:
     #     await self.stutter('Hello there! Glad to see you got that malfunctioning hatch open.')
 
     # items
-    class Laptop(ZaryaItem):
-        state = 'off'
-        tutorial = 'pending'
-        files = []
     laptop = Laptop(
         name=STRS_ITEMS['laptop']['name'], desc=STRS_ITEMS['laptop']['desc'],
         can_use=True, can_take=False, usefunc=use_laptop
@@ -510,12 +524,12 @@ class ZaryaGame:
                             '© Joel McBride 2017, 2021 \n'
                             "Remember to report any bugs or errors to 'JMcB#7918' - @ or DM me.")
         await self.n()
-        await self.stutter(f"Date: {time.strftime('%d.%m.%Y', time.gmtime(self.posix_time_ingame))}")
-        await self.stutter("For a list of commands, type 'help'.")
+        await self.stutter(f"Date: {time.strftime('%d.%m.%Y', time.gmtime(self.posix_time_ingame))} \n"
+                           "For a list of commands, type 'help'.")
 
         # command reader
         while self.carry['on']:
-            self.player.sleep += 1
+            self.player.sleepiness += 1
             self.posix_time_ingame += 3600
             await self.n()
             command_input = await discord_input(self.discord_client, self.req_channel_name)
