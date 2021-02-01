@@ -371,15 +371,21 @@ class ZaryaGame:
                 choice = await discord_input(self.discord_client, self.req_channel_name)
                 self.log(choice)
                 if choice == 'yes':
-                    # todo: add confirmation
-                    await self.stutter('You press the button and tons of Gs force you against the back of the module.\n'
-                                       "This is a cargo module, which means there's no seat to help you.\n"
-                                       'Your orbit is rapidly falling deeper into the atmosphere.\n'
-                                       'The remains of the module hits the ground at terminal velocity.\n'
-                                       "But it's ok, because you were already obliterated "
-                                       'when its unshielded mass burnt up violently in the atmosphere.\n')
-                    await self.stutters('GAME OVER')
-                    self.carry['on'] = False
+                    await self.stutter('A dialog box pops up: ARE YOU SURE? (yes/no)')
+                    choice_confirm = await discord_input(self.discord_client, self.req_channel_name)
+                    self.log(choice_confirm)
+                    if choice_confirm == 'yes':
+                        await self.stutter('You press the button and tons of Gs force you against the back of the '
+                                           'module. \n'
+                                           "This is a cargo module, which means there's no seat to help you. \n"
+                                           'Your orbit is rapidly falling deeper into the atmosphere. \n'
+                                           'The remains of the module hits the ground at terminal velocity. \n'
+                                           "But it's ok, because you were already obliterated "
+                                           'when its unshielded mass burnt up violently in the atmosphere.\n')
+                        await self.stutters('GAME OVER')
+                        self.carry['on'] = False
+                    else:
+                        await self.stutter('You chicken out. Chicken. (chicken go cluck cluck)')
                 else:
                     await self.stutter('That was probably a sensible choice.')
 
