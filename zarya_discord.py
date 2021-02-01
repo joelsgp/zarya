@@ -643,15 +643,16 @@ class ZaryaGame:
             elif command_input.startswith('use'):
                 item_to_use = command_input.removeprefix('use').lstrip()
 
-                # TODO: fix
-                if item_to_use in self.player.inventory or item_to_use in self.current_room.items:
-                    item = 'uhhh fix this yeah'
-                    if item.can_use:
-                        await item.usefunc()
+                # TODO: reduce duplicated code (the bit with a listcomp)
+                for itemspace in (self.player.inventory, self.current_room.items):
+                    if item_to_use in [item.name for item in itemspace]:
+                        item = next([item for item in itemspace if item.name == item_to_use])
+                        if item.can_use:
+                            await item.usefunc()
+                        else:
+                            await self.stutter("That item isn't usable.")
                     else:
-                        await self.stutter("That item isn't usable.")
-                else:
-                    await self.stutter("You don't have that item.")
+                        await self.stutter("You don't have that item.")
 
             elif command_input.startswith('drop'):
                 item_to_drop = command_input.removeprefix('drop').lstrip()
