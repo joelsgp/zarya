@@ -16,6 +16,8 @@ from .discord_funcs import discord_stutter, discord_input
 # todo: make more things in the strings file
 # todo: https://discord.com/channels/714154158969716780/736664393630220289/805872416521846795
 # todo: aliases for items
+# todo: `inspect` command
+# todo: help command with argument
 
 
 __version__ = '0.11.0'
@@ -245,6 +247,7 @@ class ZaryaGame:
                            "(That's your cue to wonder what it is the password to)")
 
     async def use_drive(self):
+        # todo: fix
         for itemspace in self.player.inventory, self.current_room.items:
             laptop_in_itemspace = [i for i in itemspace if isinstance(i, Laptop)]
             if laptop_in_itemspace:
@@ -429,7 +432,7 @@ class ZaryaGame:
     )
 
     paper = ZaryaItem(
-        name=STRS_ITEMS['paper'], desc=STRS_ITEMS['paper']['desc'],
+        name=STRS_ITEMS['paper']['name'], desc=STRS_ITEMS['paper']['desc'],
         can_use=True, can_take=True, usefunc=use_paper
     )
 

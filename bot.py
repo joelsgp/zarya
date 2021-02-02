@@ -2,6 +2,10 @@
 
 import os
 import json
+import subprocess
+import importlib
+
+from typing import Optional
 
 import discord
 import discord.ext.commands
@@ -31,15 +35,32 @@ help_command = discord.ext.commands.DefaultHelpCommand(no_category="Commands (pr
 client = discord.ext.commands.bot.Bot(command_prefix=PREFIXES, help_command=help_command)
 
 
-# todo: update & restart command
 @client.event
 async def on_ready():
     print('Bot running.')
 
 
+@client.command()
+@discord.ext.commands.is_owner()
+async def pull(ctx, branch: Optional[str]):
+    # todo: add check
+    if branch:
+        await ctx.send(subprocess.getoutput(f'git checkout {branch}'))
+    await ctx.send(subprocess.getoutput('git pull'))
+
+
+@client.command(name='reload-game')
+@discord.ext.commands.is_owner()
+async def reload_game(ctx):
+    # provisional as structure of loaded games will probably be changed
+    # noinspection PyTypeChecker
+    importlib.reload(zarya_discord)
+    await ctx.send('Reloaded game module.')
+
+
 @client.command(aliases=['github'])
 async def git(ctx):
-    await ctx.channel.send(f'<{GITHUB_URL}>')
+    await ctx.send(f'<{GITHUB_URL}>')
 
 
 @client.command(aliases=['log', 'log.txt'])
@@ -47,9 +68,9 @@ async def logs(ctx):
     try:
         file = discord.File(os.path.join('game', 'log.txt'))
     except FileNotFoundError:
-        await ctx.channel.send('No logs.')
+        await ctx.send('No logs.')
     else:
-        await ctx.channel.send(file=file)
+        await ctx.send(file=file)
 
 
 # todo: fix the error every time an ingame command is used that isn't a bot command
