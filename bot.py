@@ -73,7 +73,7 @@ async def git(ctx):
 @client.command()
 async def credit(ctx):
     # todo: change once translations are available
-    ctx.send(f'Hosting and translations (pending) with help from Dukt {DUKT_INVITE}')
+    await ctx.send(f'Hosting and translations (pending) with help from Dukt {DUKT_INVITE}')
 
 
 @client.command(aliases=['log', 'log.txt'])
