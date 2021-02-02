@@ -101,12 +101,16 @@ class ZaryaContainer:
 
     desc_stem = STRS_GAME['containers']['desc_stem']
 
-    def __init__(self, name: str, desc: str, can_leave: bool = True, items: List[ZaryaItem] = None):
+    def __init__(
+            self, name: str, desc: str, can_leave: bool = True, has_windows: bool = False,
+            items: List[ZaryaItem] = None
+    ):
         self.name = name
         if desc.startswith(self.desc_stem):
             desc = desc.removeprefix(self.desc_stem)
         self.desc = desc.strip()
         self.can_leave = can_leave
+        self.has_windows = has_windows
         if items is None:
             self.items = []
         else:
@@ -151,7 +155,7 @@ class ZaryaRoom(ZaryaContainer):
     """
     def __init__(self, name: str, desc: str, can_leave: bool = False, has_windows: bool = False,
                  items: List[ZaryaItem] = None, containers: List[ZaryaContainer] = None, ports: List[ZaryaPort] = None):
-        super().__init__(name, desc, can_leave, items)
+        super().__init__(name, desc, can_leave, has_windows, items)
 
         self.has_windows = has_windows
         if containers is None:
