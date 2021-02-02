@@ -23,6 +23,7 @@ import game.zarya_discord as zarya_discord
 
 
 GITHUB_URL = 'https://github.com/JMcB17/Zarya'
+DUKT_INVITE = 'https://discord.gg/UAe4fB7EHZ'
 PREFIXES = (
     '>', '> ',
     '9v', '9v ',
@@ -43,7 +44,6 @@ async def on_ready():
 @client.command(hidden=True, aliases=['update'])
 @discord.ext.commands.is_owner()
 async def pull(ctx, branch: Optional[str]):
-    # todo: add check
     if branch:
         await ctx.send(subprocess.getoutput(f'git checkout {branch}'))
     await ctx.send(subprocess.getoutput('git pull'))
@@ -53,12 +53,19 @@ async def pull(ctx, branch: Optional[str]):
 @discord.ext.commands.is_owner()
 async def restart(ctx):
     await ctx.send('Restarting bot.')
+    # https://blog.petrzemek.net/2014/03/23/restarting-a-python-script-within-itself/
     os.execv(sys.executable, ['python'] + sys.argv)
 
 
 @client.command(aliases=['github'])
 async def git(ctx):
     await ctx.send(f'<{GITHUB_URL}>')
+
+
+@client.command()
+async def credit(ctx):
+    # todo: change once translations are available
+    ctx.send(f'Hosting and translations (pending) with help from Dukt {DUKT_INVITE}')
 
 
 @client.command(aliases=['log', 'log.txt'])

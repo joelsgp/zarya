@@ -25,7 +25,6 @@ __version__ = '0.11.0'
 
 # need to make this dynamic
 DISCORD_NAME = 'JMcB#7918'
-DUKT_INVITE = 'https://discord.gg/UAe4fB7EHZ'
 LANG = 'en'
 # load strings
 with open(os.path.join('strings', f'{LANG}.json')) as strings_file:
@@ -247,7 +246,6 @@ class ZaryaGame:
                            "(That's your cue to wonder what it is the password to)")
 
     async def use_drive(self):
-        # todo: fix
         for itemspace in self.player.inventory, self.current_room.items:
             laptop_in_itemspace = [i for i in itemspace if isinstance(i, Laptop)]
             if laptop_in_itemspace:
@@ -258,8 +256,9 @@ class ZaryaGame:
                     self.drive.files = []
                 else:
                     await self.stutter('There are no files on the usb stick.')
-            else:
-                await self.stutter('You have no laptop to use it with.')
+                break
+        else:
+            await self.stutter('You have no laptop to use it with.')
 
     async def use_jumpsuit(self):
         await self.stutter('You put on the jumpsuit.')
@@ -313,7 +312,7 @@ class ZaryaGame:
             self.log(task)
             await self.n()
 
-            if task in 'turn off laptop':
+            if task in ('turn off laptop' 'turn off', 'off', 'close laptop', 'close'):
                 await self.stutter('You turn off the laptop.')
                 self.laptop.powered_on = False
 
@@ -346,7 +345,7 @@ class ZaryaGame:
                     await self.stutter('You have no files to read!')
                 else:
                     await self.stutter('The files say: ')
-                    await self.stutter('\n'.join(self.laptop.files))
+                    await self.stutter('\n'.join([f'{key}: {value}' for key, value in self.laptop.files]))
 
             elif task in ['use messenger app', 'messenger app', 'messenger']:
                 contacts = ['nasa social media team']
@@ -553,15 +552,204 @@ class ZaryaGame:
         'July', 'August', 'September', 'October', 'November', 'December'
     )
 
+    async def process_command(self, command_input):
+        # todo: fix help command duplication
+        if command_input in ['help', 'h', 'commands']:
+            help_info_block = '\n'.join(self.help_info)
+            await self.stutterf(help_info_block)
+            await self.stutter('For the uninitiated: \n'
+                               'In text-based adventure games, a good first command when '
+                               "starting out or \nentering a new place is 'look around'.")
+
+        elif command_input in ['info', 'background', 'b']:
+            await self.stutterf(
+                f'Zarya-Discord v{__version__} \n'
+                '© Joel McBride 2017, 2021 \n'
+                "Remember to report any bugs or errors to 'JMcB#7918' - @ or DM me."
+            )
+            await self.stutter(
+                'I made this game as one of my first reasonably large projects about four years ago '
+                '(2016). It was very poorly coded but I worked quite a while on it, although after I '
+                "finished most of the framework stuff I couldn't be bothered to add much more content. "
+                "The writing, what there is, is ok, it's got some funny bits I guess. It's also very "
+                'well researched, everything in the game is on the ISS in real life - including Zarya. '
+                'Anyway, I had the idea recently (2021) to make a text based adventure game for Discord, '
+                'so I went back to my old project, touched the code up a bit, ported it, and here we are.'
+            )
+
+        # ignore bot-level commands
+        elif command_input in ['logs', 'log', 'log.txt']:
+            pass
+
+        elif command_input in ['quit', 'q']:
+            self.carry['on'] = False
+
+        elif command_input in ['look around', 'look', 'la', 'l']:
+            # todo: more detailed info on windows
+            # todo: tell user where the ports lead?
+            await self.stutter(f'{self.current_room.desc_stem.rstrip()} {self.current_room.desc}.')
+            if self.current_room.has_windows:
+                await self.stutter('There are windows.')
+
+            if self.current_room.items:
+                item_descs = [f'{i.desc_stem.rstrip()} {i.desc}.' for i in self.current_room.items]
+                await self.stutter(' \n'.join(item_descs))
+
+            # only check for ports if room (not container)
+            if isinstance(self.current_room, ZaryaRoom):
+                if self.current_room.ports:
+                    ports_list = f'There are {len(self.current_room.ports)} ports:'
+                    for port in self.current_room.ports:
+                        port_state = 'open' if port.is_open else 'closed'
+                        ports_list += f' \nOne to {port.name} that is {port_state}.'
+
+                    await self.stutter(ports_list)
+
+        elif command_input in ['show inventory', 'inventory', 'si', 'i']:
+            if not self.player.inventory:
+                await self.stutter('Your inventory is empty.')
+            else:
+                await self.stutter('In your inventory is: ')
+                for inventory_item in self.player.inventory:
+                    await self.stutter(inventory_item.name)
+
+        elif command_input == 'buyburger':
+            await self.stutter('BURGER. 🍔 MMM...')
+
+        elif command_input.startswith('search'):
+            container_to_search = command_input.removeprefix('search').lstrip()
+            # could use any() here?
+            if container_to_search in [container.name for container in self.current_room.containers]:
+                self.previous_room = self.current_room
+                await self.stutter(f'You search the {container_to_search}.')
+                # todo: make this kind of functionality a method of the room and the player's inventory.
+                self.current_room = [c for c in self.current_room.containers if c.name == container_to_search][0]
+
+                if self.current_room.items:
+                    items_list = f'The {container_to_search} contain(s): \n'
+                    items_list += ' \n'.join([i.desc for i in self.current_room.items])
+                    await self.stutter(items_list)
+                else:
+                    await self.stutter("There aren't any items in here.")
+            else:
+                await self.stutter("That isn't in here.")
+
+        elif command_input in ('leave',) or command_input.startswith(('leave',)):
+            if self.current_room.can_leave:
+                await self.stutter(f'You leave the {self.current_room.name}.')
+                self.current_room = self.previous_room
+            else:
+                await self.stutter(f"I'm sorry {self.player.name}, I'm afraid you can't do that.")
+
+        elif command_input.startswith(('go through', 'gt', 'go')):
+            if isinstance(self.current_room, ZaryaContainer):
+                await self.stutter("You're searching a container, use 'leave' to leave.")
+                return
+
+            if command_input.endswith('port'):
+                direction = command_input.removesuffix('port').rstrip()
+            else:
+                direction = command_input
+
+            # note: less verbose commands must come later in the list or an incomplete prefix could be stripped.
+            for prefix in ['go through', 'gt', 'go']:
+                if direction.startswith(prefix):
+                    direction = direction.removeprefix(prefix).lstrip()
+                    break
+
+            if direction in [port.name for port in self.current_room.ports]:
+                target_port = [p for p in self.current_room.ports if p.name == direction][0]
+                if target_port.is_open:
+                    await self.stutter(f'You go through the port into {target_port.room.name}.')
+                    self.current_room = target_port.room
+                else:
+                    await self.stutter('That port is closed.')
+            else:
+                await self.stutter("The module you're in doesn't have a port there.")
+
+        elif command_input in ['take all', 'ta']:
+            if self.current_room.items:
+                # TODO: ? add ascii art here lol
+                await self.stutter('You: \n'
+                                   'TAKE \n'
+                                   'ALL THE THINGS.')
+
+                for item in self.current_room.items:
+                    if item.can_take:
+                        self.player.inventory.append(item)
+                        await self.stutter(f'You take the {item.name}.')
+                        # TODO: change this? editing in place is discouraged and may not work
+                        self.current_room.items.remove(item)
+                    else:
+                        await self.stutter(f"You can't take the {item.name}.")
+            else:
+                await self.stutter("There's nothing here.")
+
+        elif command_input.startswith(('take', 'pick up')):
+            for prefix in ('take', 'pick up'):
+                if command_input.startswith(prefix):
+                    item_to_take = command_input.removeprefix(prefix).lstrip()
+
+                    if item_to_take in [i.name for i in self.current_room.items]:
+                        item = [i for i in self.current_room.items if i.name == item_to_take][0]
+                        if item.can_take:
+                            await self.stutter(f'You take the {item.name}.')
+                            self.player.inventory.append(item)
+                            self.current_room.items.remove(item)
+                        else:
+                            await self.stutter("You can't take that.")
+                    else:
+                        await self.stutter("That item isn't here.")
+                    break
+
+        elif command_input.startswith('use'):
+            item_to_use = command_input.removeprefix('use').lstrip()
+
+            # TODO: reduce duplicated code (the bit with a listcomp)
+            for itemspace in (self.player.inventory, self.current_room.items):
+                if item_to_use in [i.name for i in itemspace]:
+                    item = [i for i in itemspace if i.name == item_to_use][0]
+                    if item.can_use:
+                        await item.usefunc(self)
+                    else:
+                        await self.stutter("That item isn't usable.")
+                    break
+            else:
+                await self.stutter("You don't have that item.")
+
+        elif command_input.startswith('drop'):
+            item_to_drop = command_input.removeprefix('drop').lstrip()
+            if item_to_drop in [item.name for item in self.player.inventory]:
+                item = [i for i in self.player.inventory if i.name == item_to_drop][0]
+                await self.stutter(f'You drop the {item.name}.')
+                self.current_room.items.append(item)
+                self.player.inventory.remove(item)
+            else:
+                await self.stutter("That item isn't in your inventory.")
+
+        elif command_input in ['skip', 's']:
+            self.skip = True
+            await self.stutter('Text will now output instantly.')
+
+        elif command_input in ['noskip', 'ns', 'n']:
+            self.skip = False
+            await self.stutter('Text will now output gradually.')
+
+        elif command_input.startswith(('name', 'setname', 'my name is')):
+            for command_invoc in ('name', 'setname', 'my name is'):
+                if command_input.startswith(command_invoc):
+                    new_name = command_input.removeprefix(command_invoc).lstrip()
+                    self.player.name = new_name
+                    await self.stutter(f'Your name is {self.player.name}.')
+
+        else:
+            await self.stutter("That's not a valid command.")
+
     async def run(self):
-        # todo: move credit to separate thing
-        # todo: move command processing to its own function for neatness
         await self.stutterf(
             f'Zarya-Discord v{__version__} \n'
             '© Joel McBride 2017, 2021 \n'
             f"Remember to report any bugs or errors to '{DISCORD_NAME}' - @ or DM me. \n"
-            # todo: change once translations are available
-            f'Hosting and translations (pending) with help from Dukt <{DUKT_INVITE}>'
         )
         await self.n()
         await self.stutter(
@@ -569,7 +757,6 @@ class ZaryaGame:
             "For a list of commands, type 'help'."
         )
 
-        # command reader
         while self.carry['on']:
             self.player.sleepiness += 1
             # one hour
@@ -591,198 +778,8 @@ class ZaryaGame:
             command_input = command_input.lower()
             self.log(command_input)
             await self.n()
+            await self.process_command(command_input)
 
-            # todo: fix help command duplication
-            if command_input in ['help', 'h', 'commands']:
-                help_info_block = '\n'.join(self.help_info)
-                await self.stutterf(help_info_block)
-                await self.stutter('For the uninitiated: \n'
-                                   'In text-based adventure games, a good first command when '
-                                   "starting out or \nentering a new place is 'look around'.")
-
-            elif command_input in ['info', 'background', 'b']:
-                await self.stutterf(
-                    'aaaaaaaaaa'
-                    f'Zarya-Discord v{__version__}'
-                    '© Joel McBride 2017, 2021'
-                    "Remember to report any bugs or errors to 'JMcB#7918' - @ or DM me."
-                )
-                await self.stutter(
-                    'I made this game as one of my first reasonably large projects about four years ago '
-                    '(2016). It was very poorly coded but I worked quite a while on it, although after I '
-                    "finished most of the framework stuff I couldn't be bothered to add much more content. "
-                    "The writing, what there is, is ok, it's got some funny bits I guess. It's also very "
-                    'well researched, everything in the game is on the ISS in real life - including Zarya. '
-                    'Anyway, I had the idea recently (2021) to make a text based adventure game for Discord, '
-                    'so I went back to my old project, touched the code up a bit, ported it, and here we are.'
-                )
-
-            # ignore bot-level commands
-            elif command_input in ['logs', 'log', 'log.txt']:
-                pass
-
-            elif command_input in ['quit', 'q']:
-                self.carry['on'] = False
-
-            elif command_input in ['look around', 'look', 'la', 'l']:
-                # todo: more detailed info on windows
-                # todo: tell user where the ports lead?
-                await self.stutter(f'{self.current_room.desc_stem.rstrip()} {self.current_room.desc}.')
-                if self.current_room.has_windows:
-                    await self.stutter('There are windows.')
-
-                if self.current_room.items:
-                    item_descs = [f'{i.desc_stem.rstrip()} {i.desc}.' for i in self.current_room.items]
-                    await self.stutter(' \n'.join(item_descs))
-
-                # only check for ports if room (not container)
-                if isinstance(self.current_room, ZaryaRoom):
-                    if self.current_room.ports:
-                        ports_list = f'There are {len(self.current_room.ports)} ports:'
-                        for port in self.current_room.ports:
-                            port_state = 'open' if port.is_open else 'closed'
-                            ports_list += f' \nOne to {port.name} that is {port_state}.'
-
-                        await self.stutter(ports_list)
-
-            elif command_input in ['show inventory', 'inventory', 'si', 'i']:
-                if not self.player.inventory:
-                    await self.stutter('Your inventory is empty.')
-                else:
-                    await self.stutter('In your inventory is: ')
-                    for inventory_item in self.player.inventory:
-                        await self.stutter(inventory_item.name)
-
-            elif command_input == 'buyburger':
-                await self.stutter('BURGER. 🍔 MMM...')
-
-            elif command_input.startswith('search'):
-                container_to_search = command_input.removeprefix('search').lstrip()
-                # could use any() here?
-                if container_to_search in [container.name for container in self.current_room.containers]:
-                    self.previous_room = self.current_room
-                    await self.stutter(f'You search the {container_to_search}.')
-                    # todo: make this kind of functionality a method of the room and the player's inventory.
-                    self.current_room = [c for c in self.current_room.containers if c.name == container_to_search][0]
-
-                    if self.current_room.items:
-                        items_list = f'The {container_to_search} contain(s): \n'
-                        items_list += ' \n'.join([i.desc for i in self.current_room.items])
-                        await self.stutter(items_list)
-                    else:
-                        await self.stutter("There aren't any items in here.")
-                else:
-                    await self.stutter("That isn't in here.")
-
-            elif command_input in ('leave',) or command_input.startswith(('leave',)):
-                if self.current_room.can_leave:
-                    await self.stutter(f'You leave the {self.current_room.name}.')
-                    self.current_room = self.previous_room
-                else:
-                    await self.stutter(f"I'm sorry {self.player.name}, I'm afraid you can't do that.")
-
-            # TODO: clean this logic statement up
-            elif command_input.startswith(('go through', 'gt', 'go')):
-                if command_input.endswith('port'):
-                    direction = command_input.removesuffix('port').rstrip()
-                else:
-                    direction = command_input
-
-                # note: less verbose commands must come later in the list or an incomplete prefix could be stripped.
-                for prefix in ['go through', 'gt', 'go']:
-                    if direction.startswith(prefix):
-                        direction = direction.removeprefix(prefix).lstrip()
-                        break
-
-                if direction in [port.name for port in self.current_room.ports]:
-                    target_port = [p for p in self.current_room.ports if p.name == direction][0]
-                    if target_port.is_open:
-                        await self.stutter(f'You go through the port into {target_port.room.name}.')
-                        self.current_room = target_port.room
-                    else:
-                        await self.stutter('That port is closed.')
-                else:
-                    await self.stutter("The module you're in doesn't have a port there.")
-
-            elif command_input in ['take all', 'ta']:
-                if self.current_room.items:
-                    # TODO: ? add ascii art here lol
-                    await self.stutter('You: \n'
-                                       'TAKE \n'
-                                       'ALL THE THINGS.')
-
-                    for item in self.current_room.items:
-                        if item.can_take:
-                            self.player.inventory.append(item)
-                            await self.stutter(f'You take the {item.name}.')
-                            # TODO: change this? editing in place is discouraged and may not work
-                            self.current_room.items.remove(item)
-                        else:
-                            await self.stutter(f"You can't take the {item.name}.")
-                else:
-                    await self.stutter("There's nothing here.")
-
-            elif command_input.startswith(('take', 'pick up')):
-                for prefix in ('take', 'pick up'):
-                    if command_input.startswith(prefix):
-                        item_to_take = command_input.removeprefix(prefix).lstrip()
-
-                        if item_to_take in [i.name for i in self.current_room.items]:
-                            item = [i for i in self.current_room.items if i.name == item_to_take][0]
-                            if item.can_take:
-                                await self.stutter(f'You take the {item.name}.')
-                                self.player.inventory.append(item)
-                                self.current_room.items.remove(item)
-                            else:
-                                await self.stutter("You can't take that.")
-                        else:
-                            await self.stutter("That item isn't here.")
-                        break
-
-            elif command_input.startswith('use'):
-                item_to_use = command_input.removeprefix('use').lstrip()
-
-                # TODO: reduce duplicated code (the bit with a listcomp)
-                for itemspace in (self.player.inventory, self.current_room.items):
-                    if item_to_use in [i.name for i in itemspace]:
-                        item = [i for i in itemspace if i.name == item_to_use][0]
-                        if item.can_use:
-                            await item.usefunc(self)
-                        else:
-                            await self.stutter("That item isn't usable.")
-                        break
-                else:
-                    await self.stutter("You don't have that item.")
-
-            elif command_input.startswith('drop'):
-                item_to_drop = command_input.removeprefix('drop').lstrip()
-                if item_to_drop in [item.name for item in self.player.inventory]:
-                    item = [i for i in self.player.inventory if i.name == item_to_drop][0]
-                    await self.stutter(f'You drop the {item.name}.')
-                    self.current_room.items.append(item)
-                    self.player.inventory.remove(item)
-                else:
-                    await self.stutter("That item isn't in your inventory.")
-
-            elif command_input in ['skip', 's']:
-                self.skip = True
-                await self.stutter('Text will now output instantly.')
-
-            elif command_input in ['noskip', 'ns', 'n']:
-                self.skip = False
-                await self.stutter('Text will now output gradually.')
-
-            elif command_input.startswith(('name', 'setname', 'my name is')):
-                for command_invoc in ('name', 'setname', 'my name is'):
-                    if command_input.startswith(command_invoc):
-                        new_name = command_input.removeprefix(command_invoc).lstrip()
-                        self.player.name = new_name
-                        await self.stutter(f'Your name is {self.player.name}.')
-
-            else:
-                await self.stutter("That's not a valid command.")
-
-        # end of run() method
         await self.stutter('Thanks for playing!')
 
     # logging
