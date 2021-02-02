@@ -15,6 +15,7 @@ from .discord_funcs import discord_stutter, discord_input
 # could make some bizarre plotline for it, aliens probably
 # todo: make more things in the strings file
 # todo: https://discord.com/channels/714154158969716780/736664393630220289/805872416521846795
+# todo: aliases for items
 
 
 __version__ = '0.11.0'
@@ -628,13 +629,15 @@ class ZaryaGame:
                     item_descs = [f'{i.desc_stem.rstrip()} {i.desc}.' for i in self.current_room.items]
                     await self.stutter(' \n'.join(item_descs))
 
-                if self.current_room.ports:
-                    ports_list = f'There are {len(self.current_room.ports)} ports:'
-                    for port in self.current_room.ports:
-                        port_state = 'open' if port.is_open else 'closed'
-                        ports_list += f' \nOne to {port.name} that is {port_state}.'
+                # only check for ports if room (not container)
+                if isinstance(self.current_room, ZaryaRoom):
+                    if self.current_room.ports:
+                        ports_list = f'There are {len(self.current_room.ports)} ports:'
+                        for port in self.current_room.ports:
+                            port_state = 'open' if port.is_open else 'closed'
+                            ports_list += f' \nOne to {port.name} that is {port_state}.'
 
-                    await self.stutter(ports_list)
+                        await self.stutter(ports_list)
 
             elif command_input in ['show inventory', 'inventory', 'si', 'i']:
                 if not self.player.inventory:
