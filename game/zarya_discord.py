@@ -557,7 +557,6 @@ class ZaryaGame:
     )
 
     async def process_command(self, command_input):
-        # todo: fix help command duplication
         if command_input in ['help', 'h', 'commands']:
             help_info_block = '\n'.join(self.help_info)
             await self.stutterf(help_info_block)

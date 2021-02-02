@@ -32,7 +32,13 @@ PREFIXES = (
 with open('settings.json', 'r') as settings_json:
     settings = json.load(settings_json)
 
+
+def game_instance_running_check(ctx):
+    return ctx.channel.id not in ctx.bot.game_instances
+
+
 help_command = discord.ext.commands.DefaultHelpCommand(no_category="Commands (prefixes - '>', '9v')")
+help_command.add_check(game_instance_running_check)
 client = discord.ext.commands.bot.Bot(command_prefix=PREFIXES, help_command=help_command)
 
 client.game_instances = {}
