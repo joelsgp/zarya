@@ -31,6 +31,7 @@ help_command = discord.ext.commands.DefaultHelpCommand(no_category="Commands (pr
 client = discord.ext.commands.bot.Bot(command_prefix=PREFIXES, help_command=help_command)
 
 
+# todo: update & restart command
 @client.event
 async def on_ready():
     print('Bot running.')

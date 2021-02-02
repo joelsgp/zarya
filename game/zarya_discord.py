@@ -660,11 +660,11 @@ class ZaryaGame:
                     self.current_room = [c for c in self.current_room.containers if c.name == container_to_search][0]
 
                     if self.current_room.items:
-                        await self.stutter(f'The {container_to_search} contain(s):')
-                        for item in self.current_room.items:
-                            await self.stutter(item.desc)
+                        items_list = f'The {container_to_search} contain(s): \n'
+                        items_list += ' \n'.join([i.desc for i in self.current_room.items])
+                        await self.stutter(items_list)
                     else:
-                        await self.stutter("There isn't anything here.")
+                        await self.stutter("There aren't any items in here.")
                 else:
                     await self.stutter("That isn't in here.")
 
