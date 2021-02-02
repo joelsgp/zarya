@@ -35,6 +35,8 @@ with open('settings.json', 'r') as settings_json:
 help_command = discord.ext.commands.DefaultHelpCommand(no_category="Commands (prefixes - '>', '9v')")
 client = discord.ext.commands.bot.Bot(command_prefix=PREFIXES, help_command=help_command)
 
+client.game_instances = {}
+
 
 @client.event
 async def on_ready():
@@ -80,13 +82,13 @@ async def logs(ctx):
 
 # todo: fix the error every time an ingame command is used that isn't a bot command
 @client.command()
-async def play(ctx, *args):
-    # only run with no args, to avoid crossover with in-game command
-    if args:
-        return
-    # todo: make instancing better
-    # game_instance = zarya_discord.ZaryaGame(client, ctx.channel, settings['discord']['channel'])
+async def play(ctx):
+    if ctx.channel.id in client.game_instances:
+        return await ctx.send("You're already playing a game in this channel.")
+
     game_instance = zarya_discord.ZaryaGame(client, ctx.channel, ctx.channel.name)
+    client.game_instances[ctx.channel.id] = game_instance
+
     game_instance.log_start()
     await game_instance.run()
     del game_instance

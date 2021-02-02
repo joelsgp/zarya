@@ -84,7 +84,7 @@ class Laptop(ZaryaItem):
     """Subclass for the laptop item, with additional attributes."""
     powered_on = False
     tutorial_done = False
-    files = []
+    files = {}
 
 
 # TODO: allow giving an identifier to the constructor to automatically get the name and desc from the strings file
@@ -253,7 +253,7 @@ class ZaryaGame:
                 if self.drive.files:
                     await self.stutter('You transfer all the files on the usb stick to the laptop.')
                     laptop.files = self.drive.files
-                    self.drive.files = []
+                    self.drive.files = {}
                 else:
                     await self.stutter('There are no files on the usb stick.')
                 break
@@ -312,7 +312,7 @@ class ZaryaGame:
             self.log(task)
             await self.n()
 
-            if task in ('turn off laptop' 'turn off', 'off', 'close laptop', 'close'):
+            if task in ('turn off laptop', 'turn off', 'off', 'close laptop', 'close', 'quit'):
                 await self.stutter('You turn off the laptop.')
                 self.laptop.powered_on = False
 
@@ -326,11 +326,13 @@ class ZaryaGame:
                 )
 
             # todo: puzzle for connecting to the internet?
-            elif task in ['browse the web', 'browse web', 'browse', 'web']:
+            elif task in ['browse the web', 'browse web', 'browse', 'web', 'browser', 'web browser']:
                 await self.stutter('A browser window opens. Where do you want to go?')
                 url = await discord_input(self.discord_client, self.req_channel_name)
                 self.log(url)
                 try:
+                    if not url.startswith('http'):
+                        url = 'http://' + url
                     async with aiohttp.ClientSession() as session:
                         async with session.get(url) as response:
                             html = await response.text()
@@ -339,13 +341,15 @@ class ZaryaGame:
                                        'Oh well.')
                 except ValueError:
                     await self.stutter("That's not a valid URL.")
+                except aiohttp.ClientConnectorError:
+                    await self.stutter("The site had an error.")
 
             elif task in ['read files', 'read', 'files']:
                 if not self.laptop.files:
                     await self.stutter('You have no files to read!')
                 else:
                     await self.stutter('The files say: ')
-                    await self.stutter('\n'.join([f'{key}: {value}' for key, value in self.laptop.files]))
+                    await self.stutter('\n'.join([f'{key}: {value}' for key, value in self.laptop.files.items()]))
 
             elif task in ['use messenger app', 'messenger app', 'messenger']:
                 contacts = ['nasa social media team']
@@ -674,14 +678,16 @@ class ZaryaGame:
                                    'TAKE \n'
                                    'ALL THE THINGS.')
 
+                items_to_remove = []
                 for item in self.current_room.items:
                     if item.can_take:
                         self.player.inventory.append(item)
                         await self.stutter(f'You take the {item.name}.')
-                        # TODO: change this? editing in place is discouraged and may not work
-                        self.current_room.items.remove(item)
+                        items_to_remove.append(item)
                     else:
                         await self.stutter(f"You can't take the {item.name}.")
+                for item in items_to_remove:
+                    self.current_room.items.remove(item)
             else:
                 await self.stutter("There's nothing here.")
 
