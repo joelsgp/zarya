@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 
 import os
+import sys
 import json
 import subprocess
-import importlib
 
 from typing import Optional
 
@@ -40,7 +40,7 @@ async def on_ready():
     print('Bot running.')
 
 
-@client.command()
+@client.command(hidden=True, aliases=['update'])
 @discord.ext.commands.is_owner()
 async def pull(ctx, branch: Optional[str]):
     # todo: add check
@@ -49,13 +49,11 @@ async def pull(ctx, branch: Optional[str]):
     await ctx.send(subprocess.getoutput('git pull'))
 
 
-@client.command(name='reload-game')
+@client.command(hidden=True)
 @discord.ext.commands.is_owner()
-async def reload_game(ctx):
-    # provisional as structure of loaded games will probably be changed
-    # noinspection PyTypeChecker
-    importlib.reload(zarya_discord)
-    await ctx.send('Reloaded game module.')
+async def restart(ctx):
+    await ctx.send('Restarting bot.')
+    os.execv(sys.executable, ['python'] + sys.argv)
 
 
 @client.command(aliases=['github'])
