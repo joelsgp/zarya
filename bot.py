@@ -90,14 +90,16 @@ async def logs(ctx):
 @client.command()
 async def play(ctx):
     if ctx.channel.id in client.game_instances:
-        return await ctx.send("You're already playing a game in this channel.")
+        return
 
     game_instance = zarya_discord.ZaryaGame(client, ctx.channel, ctx.channel.name)
     client.game_instances[ctx.channel.id] = game_instance
 
     game_instance.log_start()
+    # todo: catch errors better (might fail to close the instance if it errors)
     await game_instance.run()
-    del game_instance
+
+    client.game_instances.pop(ctx.channel.id)
 
 
 if __name__ == '__main__':
