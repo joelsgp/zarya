@@ -554,6 +554,8 @@ class ZaryaGame:
     )
 
     async def run(self):
+        # todo: move credit to separate thing
+        # todo: move command processing to its own function for neatness
         await self.stutterf(
             f'Zarya-Discord v{__version__} \n'
             '© Joel McBride 2017, 2021 \n'
@@ -600,6 +602,7 @@ class ZaryaGame:
 
             elif command_input in ['info', 'background', 'b']:
                 await self.stutterf(
+                    'aaaaaaaaaa'
                     f'Zarya-Discord v{__version__}'
                     '© Joel McBride 2017, 2021'
                     "Remember to report any bugs or errors to 'JMcB#7918' - @ or DM me."

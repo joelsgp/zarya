@@ -88,4 +88,5 @@ async def play(ctx, *args):
 
 
 if __name__ == '__main__':
+    print('Bot starting..')
     client.run(settings['discord']['token'])
