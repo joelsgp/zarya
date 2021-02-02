@@ -386,6 +386,7 @@ class ZaryaGame:
                 else:
                     await self.stutter("They aren't in your contacts list.")
 
+            # todo: fix moving between rooms, again
             elif task in 'play text game':
                 await ZaryaGame(self.discord_client, self.send_channel, self.req_channel_name).run()
 
@@ -645,7 +646,7 @@ class ZaryaGame:
                 await self.stutter(f"I'm sorry {self.player.name}, I'm afraid you can't do that.")
 
         elif command_input.startswith(('go through', 'gt', 'go')):
-            if isinstance(self.current_room, ZaryaContainer):
+            if isinstance(self.current_room, ZaryaContainer) and not isinstance(self.current_room, ZaryaRoom):
                 await self.stutter("You're searching a container, use 'leave' to leave.")
                 return
 
