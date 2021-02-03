@@ -23,8 +23,8 @@ from .discord_funcs import discord_stutter, discord_input
 __version__ = '0.11.0'
 
 
-# need to make this dynamic
 DISCORD_NAME = 'JMcB#7918'
+# need to make this dynamic
 LANG = 'en'
 # load strings
 with open(os.path.join('strings', f'{LANG}.json')) as strings_file:

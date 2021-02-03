@@ -96,10 +96,10 @@ async def play(ctx):
     client.game_instances[ctx.channel.id] = game_instance
 
     game_instance.log_start()
-    # todo: catch errors better (might fail to close the instance if it errors)
-    await game_instance.run()
-
-    client.game_instances.pop(ctx.channel.id)
+    try:
+        await game_instance.run()
+    finally:
+        client.game_instances.pop(ctx.channel.id)
 
 
 if __name__ == '__main__':
