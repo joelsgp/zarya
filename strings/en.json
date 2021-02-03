@@ -82,7 +82,7 @@
 
     "player": {
       "name_default": "player",
-      "proper_name_default": "Player"
+      "proper_name_default": ""
     },
 
     "actions": {

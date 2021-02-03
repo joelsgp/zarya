@@ -24,24 +24,40 @@ with open('translations.csv', 'w', newline='') as csv_file:
         ['desc_stem', 'Description stem, added to the start of every description.'],
         ['name', 'Name.'],
         ['desc', 'Description.'],
-        [''],
+        [], [], [],
         ['', f'English (original - {english_author})', f'Dutch {dutch_translator}', f'French ({french_translator})'],
-        [''],
+        [],
     ])
 
-    # first category header and desc_stem
+    for category in ('items', 'containers', 'rooms'):
+        # first category header and desc_stem
+        w.writerows([
+            [category.title()],
+            [],
+            ['desc_stem', source['game'][category]['desc_stem']],
+            [],
+        ])
+
+        # first category content
+        for key, values in source['game'][category].items():
+            if not isinstance(values, dict):
+                continue
+
+            for field in ('name', 'desc'):
+                # proper names don't need to be translated
+                if field == 'name':
+                    if values.get('proper_name') == values['name'].title():
+                        continue
+
+                w.writerow([f'{key}/{field}', values[field]])
+            w.writerow([])
+
+        w.writerow([])
+
+    # player strings
     w.writerows([
-        ['Items'],
-        [''],
-        ['desc_stem', source['game']['items']['desc_stem']],
-        [''],
+        ['Player'],
+        [],
+        ['player/name_default', source['game']['player']['name_default']],
+        [],
     ])
-
-    # first category content
-    for item, values in source['game']['items'].items():
-        if not isinstance(values, dict):
-            continue
-
-        for field in ('name', 'desc'):
-            w.writerow([f'{item}/{field}', values[field]])
-        w.writerow([''])

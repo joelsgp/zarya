@@ -518,7 +518,7 @@ class ZaryaGame:
 
     # player
     player = ZaryaPlayer(
-        name=STRS_GAME['player']['name_default'], inventory=[], wearing='jumpsuit'
+        name=STRS_GAME['player']['name_default'].title(), inventory=[], wearing='jumpsuit'
     )
 
     # def helpwindow():
