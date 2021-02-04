@@ -25,7 +25,7 @@ with open('translations.csv', 'w', newline='') as csv_file:
         ['name', 'Name.'],
         ['desc', 'Description.'],
         [], [], [],
-        ['', f'English (original - {english_author})', f'Dutch {dutch_translator}', f'French ({french_translator})'],
+        ['', f'English (original - {english_author})', f'Dutch ({dutch_translator})', f'French ({french_translator})'],
         [],
     ])
 

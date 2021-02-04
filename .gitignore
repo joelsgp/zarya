@@ -3,6 +3,7 @@
 
 __pycache__/
 
+strings/translations.csv
 settings.json
 log.txt
 9v-icon.png

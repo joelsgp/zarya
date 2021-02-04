@@ -24,6 +24,32 @@ __version__ = '0.11.0'
 
 
 DISCORD_NAME = 'JMcB#7918'
+
+
+def load_strings(lang, default='en', use_aliases=True, all_aliases=None):
+    if use_aliases and not all_aliases:
+        all_aliases = {
+            'en': ['eng', 'en-uk', 'english', 'british english'],
+            'nl': ['nld', 'dut', 'dutch', 'flemish', 'nederlands', 'vlaams'],
+            'fr': ['fra', 'fre', 'french', 'français', 'langue français', 'francais', 'langue francais'],
+        }
+
+    if use_aliases:
+        for code, aliases in all_aliases.items():
+            if lang in aliases:
+                lang = code
+                break
+
+    defaulted = False
+    if lang not in all_aliases:
+        lang = default
+        defaulted = True
+
+    with open(os.path.join('strings', f'{lang}.json')) as strings_file:
+        strings = json.load(strings_file)
+    return strings, defaulted
+
+
 # need to make this dynamic
 LANG = 'en'
 # load strings
