@@ -22,6 +22,7 @@ import game.zarya_discord as zarya_discord
 # https://discord.com/api/oauth2/authorize?client_id=799634237355065395&permissions=8&scope=bot
 
 
+BOT_ADD_LINK = 'https://discord.com/api/oauth2/authorize?client_id=799634237355065395&permissions=34816&scope=bot'
 GITHUB_URL = 'https://github.com/JMcB17/Zarya'
 DUKT_INVITE = 'https://discord.gg/UAe4fB7EHZ'
 PREFIXES = (
@@ -65,7 +66,12 @@ async def restart(ctx):
     os.execv(sys.executable, ['python'] + sys.argv)
 
 
-@client.command(aliases=['github'])
+@client.command(aliases=['inv', 'add'], description='Get the bot add link')
+async def invite(ctx):
+    await ctx.send(BOT_ADD_LINK)
+
+
+@client.command(aliases=['github'], description='Get the bot source code link')
 async def git(ctx):
     await ctx.send(f'<{GITHUB_URL}>')
 
