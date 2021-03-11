@@ -68,7 +68,7 @@ async def restart(ctx):
 
 @client.command(aliases=['inv', 'add'], description='Get the bot add link')
 async def invite(ctx):
-    await ctx.send(BOT_ADD_LINK)
+    await ctx.send(f'<BOT_ADD_LINK>')
 
 
 @client.command(aliases=['github'], description='Get the bot source code link')
