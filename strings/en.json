@@ -86,7 +86,7 @@
     },
 
     "actions": {
-      "startup": "Zarya-Discord v{version}\n© Joel McBride 2017, 2021\nRemember to report any bugs or errors to 'JMcB#7918' - @ or DM me.\nDate: {date}\nFor a list of commands, type 'help'."
+      "startup": "Zarya-Discord v{version}\n© Joel M 2017, 2021\nRemember to report any bugs or errors to 'JMcB#7918' - @ or DM me.\nDate: {date}\nFor a list of commands, type 'help'."
     }
   }
 }

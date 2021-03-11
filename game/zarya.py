@@ -334,7 +334,7 @@ def run_game():
     Room = Zarya
     FicEpoch = 968716800
     stutterf(f'Zarya v{__version__}')
-    stutterf('© Joel McBride 2017, 2021')
+    stutterf('© Joel M 2017, 2021')
     stutterf("Remember to report any bugs or errors to 'joel.mcbride1@live.com'.")
     n()
     stutter('Date: ' + datetime.fromtimestamp(FicEpoch).strftime('%d.%m.%Y'))

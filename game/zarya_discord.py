@@ -25,6 +25,7 @@ __version__ = '0.11.0'
 
 # need to make this dynamic
 DISCORD_NAME = 'JMcB#7918'
+COPYRIGHT = '© Joel M 2017, 2021'
 LANG = 'en'
 # load strings
 with open(os.path.join('strings', f'{LANG}.json')) as strings_file:
@@ -568,7 +569,7 @@ class ZaryaGame:
         elif command_input in ['info', 'background', 'b']:
             await self.stutterf(
                 f'Zarya-Discord v{__version__} \n'
-                '© Joel McBride 2017, 2021 \n'
+                f'{COPYRIGHT} \n'
                 "Remember to report any bugs or errors to 'JMcB#7918' - @ or DM me."
             )
             await self.stutter(
@@ -754,7 +755,7 @@ class ZaryaGame:
     async def run(self):
         await self.stutterf(
             f'Zarya-Discord v{__version__} \n'
-            '© Joel McBride 2017, 2021 \n'
+            f'{COPYRIGHT} \n'
             f"Remember to report any bugs or errors to '{DISCORD_NAME}' - @ or DM me. \n"
         )
         await self.n()
