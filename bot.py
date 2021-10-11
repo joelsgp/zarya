@@ -22,9 +22,11 @@ import game.zarya_discord as zarya_discord
 # https://discord.com/api/oauth2/authorize?client_id=799634237355065395&permissions=8&scope=bot
 
 
+__version__ = '0.1.0'
+
+
 BOT_ADD_LINK = 'https://discord.com/api/oauth2/authorize?client_id=799634237355065395&permissions=34816&scope=bot'
 GITHUB_URL = 'https://github.com/JMcB17/Zarya'
-DUKT_INVITE = 'https://discord.gg/UAe4fB7EHZ'
 PREFIXES = (
     '>', '> ',
     '9v', '9v ',
@@ -62,8 +64,8 @@ async def pull(ctx, branch: Optional[str]):
 @discord.ext.commands.is_owner()
 async def restart(ctx):
     await ctx.send('Restarting bot.')
-    # https://blog.petrzemek.net/2014/03/23/restarting-a-python-script-within-itself/
-    os.execv(sys.executable, ['python'] + sys.argv)
+    # pm2 should start it again
+    sys.exit()
 
 
 @client.command(aliases=['inv', 'add'], description='Get the bot add link')
@@ -71,15 +73,9 @@ async def invite(ctx):
     await ctx.send(f'<BOT_ADD_LINK>')
 
 
-@client.command(aliases=['github'], description='Get the bot source code link')
-async def git(ctx):
+@client.command(name='github-link', aliases=['github', 'git'], description='Get the bot source code link')
+async def github_link(ctx):
     await ctx.send(f'<{GITHUB_URL}>')
-
-
-@client.command()
-async def credit(ctx):
-    # todo: change once translations are available
-    await ctx.send(f'Hosting and translations (pending) with help from Dukt {DUKT_INVITE}')
 
 
 @client.command(aliases=['log', 'log.txt'])
