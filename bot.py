@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 
-import tomllib
 import os
 import subprocess
 import sys
+import tomllib
 from typing import Optional
 
 import discord
@@ -32,7 +32,7 @@ PREFIXES = (
     "9v ",
 )
 
-with open("settings.toml", "rb") as settings_file:
+with open("config.toml", "rb") as settings_file:
     settings = tomllib.load(settings_file)
 
 

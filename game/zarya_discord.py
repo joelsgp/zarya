@@ -11,8 +11,6 @@ from .discord_funcs import discord_input, discord_stutter
 # from tkinter import *
 
 
-
-
 # idea: dungeon crawler mode? https://discord.com/channels/714154158969716780/736664393630220289/805862557033299992
 # could make some bizarre plotline for it, aliens probably
 # todo: make more things in the strings file
