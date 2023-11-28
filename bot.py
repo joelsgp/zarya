@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-
+import logging
 import os
 import subprocess
 import sys
@@ -115,8 +115,9 @@ async def play(ctx):
 
 
 def main():
+    formatter = logging.Formatter(logging.BASIC_FORMAT)
     print("Bot starting..")
-    bot.run(settings["discord"]["token"])
+    bot.run(settings["discord"]["token"], log_formatter=formatter)
 
 
 if __name__ == "__main__":
