@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import json
+import tomllib
 import os
 import subprocess
 import sys
@@ -32,8 +32,8 @@ PREFIXES = (
     "9v ",
 )
 
-with open("settings.json", "r") as settings_json:
-    settings = json.load(settings_json)
+with open("settings.toml", "rb") as settings_file:
+    settings = tomllib.load(settings_file)
 
 
 def game_instance_running_check(ctx):
