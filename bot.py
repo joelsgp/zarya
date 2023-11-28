@@ -46,19 +46,19 @@ help_command = discord.ext.commands.DefaultHelpCommand(
 help_command.add_check(game_instance_running_check)
 intents = discord.Intents.default()
 intents.message_content = True
-client = discord.ext.commands.bot.Bot(
+bot = discord.ext.commands.bot.Bot(
     command_prefix=PREFIXES, help_command=help_command, intents=intents
 )
 
-client.game_instances = {}
+bot.game_instances = {}
 
 
-@client.event
+@bot.event
 async def on_ready():
     print("Bot running.")
 
 
-@client.command(hidden=True, aliases=["update"])
+@bot.command(hidden=True, aliases=["update"])
 @discord.ext.commands.is_owner()
 async def pull(ctx, branch: Optional[str]):
     if branch:
@@ -66,7 +66,7 @@ async def pull(ctx, branch: Optional[str]):
     await ctx.send(subprocess.getoutput("git pull"))
 
 
-@client.command(hidden=True)
+@bot.command(hidden=True)
 @discord.ext.commands.is_owner()
 async def restart(ctx):
     await ctx.send("Restarting bot.")
@@ -74,12 +74,12 @@ async def restart(ctx):
     sys.exit()
 
 
-@client.command(aliases=["inv", "add"], description="Get the bot add link")
+@bot.command(aliases=["inv", "add"], description="Get the bot add link")
 async def invite(ctx):
     await ctx.send(f"<BOT_ADD_LINK>")
 
 
-@client.command(
+@bot.command(
     name="github-link",
     aliases=["github", "git"],
     description="Get the bot source code link",
@@ -88,7 +88,7 @@ async def github_link(ctx):
     await ctx.send(f"<{GITHUB_URL}>")
 
 
-@client.command(aliases=["log", "log.txt"])
+@bot.command(aliases=["log", "log.txt"])
 async def logs(ctx):
     try:
         file = discord.File(os.path.join("game", "log.txt"))
@@ -99,21 +99,25 @@ async def logs(ctx):
 
 
 # todo: fix the error every time an ingame command is used that isn't a bot command
-@client.command()
+@bot.command()
 async def play(ctx):
-    if ctx.channel.id in client.game_instances:
+    if ctx.channel.id in bot.game_instances:
         return
 
-    game_instance = zarya_discord.ZaryaGame(client, ctx.channel, ctx.channel.name)
-    client.game_instances[ctx.channel.id] = game_instance
+    game_instance = zarya_discord.ZaryaGame(bot, ctx.channel, ctx.channel.name)
+    bot.game_instances[ctx.channel.id] = game_instance
 
     game_instance.log_start()
     # todo: catch errors better (might fail to close the instance if it errors)
     await game_instance.run()
 
-    client.game_instances.pop(ctx.channel.id)
+    bot.game_instances.pop(ctx.channel.id)
+
+
+def main():
+    print("Bot starting..")
+    bot.run(settings["discord"]["token"])
 
 
 if __name__ == "__main__":
-    print("Bot starting..")
-    client.run(settings["discord"]["token"])
+    main()
