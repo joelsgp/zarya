@@ -1,8 +1,7 @@
-import time
 import random
-import urllib.request
+import time
 import urllib.error
-
+import urllib.request
 from datetime import datetime
 
 # from tkinter import *

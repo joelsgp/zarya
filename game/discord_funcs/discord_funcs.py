@@ -1,6 +1,5 @@
-import time
 import random
-
+import time
 
 # TODO: improved framework, compatibility with builtin print and input, more features, etc.
 # TODO: create strings file, csv parser for translations, lang setting in settings

@@ -1,17 +1,15 @@
 #!/usr/bin/env python
 
-import os
-import sys
 import json
+import os
 import subprocess
-
+import sys
 from typing import Optional
 
 import discord
 import discord.ext.commands
 
 import game.zarya_discord as zarya_discord
-
 
 # todo: update readme
 

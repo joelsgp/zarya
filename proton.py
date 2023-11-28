@@ -1,9 +1,8 @@
 #!/usr/bin/env python
 
 import os
-import urllib.request
 import urllib.error
-
+import urllib.request
 
 __version__ = "0.10.0"
 

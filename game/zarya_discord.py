@@ -1,15 +1,16 @@
-import os
 import json
-import time
+import os
 import random
-
-from typing import List, Callable
-
-# from tkinter import *
+import time
+from typing import Callable, List
 
 import aiohttp
 
-from .discord_funcs import discord_stutter, discord_input
+from .discord_funcs import discord_input, discord_stutter
+
+# from tkinter import *
+
+
 
 
 # idea: dungeon crawler mode? https://discord.com/channels/714154158969716780/736664393630220289/805862557033299992
