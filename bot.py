@@ -20,7 +20,7 @@ import game.zarya_discord as zarya_discord
 # https://discord.com/api/oauth2/authorize?client_id=799634237355065395&permissions=8&scope=bot
 
 
-__version__ = "0.1.0"
+__version__ = "0.2.0"
 
 
 BOT_ADD_LINK = "https://discord.com/api/oauth2/authorize?client_id=799634237355065395&permissions=34816&scope=bot"
