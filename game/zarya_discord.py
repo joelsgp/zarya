@@ -26,8 +26,8 @@ __version__ = "0.11.0"
 
 
 # need to make this dynamic
-DISCORD_NAME = "JMcB#7918"
-COPYRIGHT = "© Joel M 2017, 2021"
+DISCORD_NAME = "jmcb"
+COPYRIGHT = "© Joel M 2017, 2021, 2023"
 LANG = "en"
 # load strings
 with open(os.path.join("strings", f"{LANG}.json")) as strings_file:

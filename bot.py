@@ -24,7 +24,7 @@ __version__ = "0.2.0"
 
 
 BOT_ADD_LINK = "https://discord.com/api/oauth2/authorize?client_id=799634237355065395&permissions=34816&scope=bot"
-GITHUB_URL = "https://github.com/JMcB17/Zarya"
+GITHUB_URL = "https://github.com/joelsgp/zarya"
 PREFIXES = (
     ">",
     "> ",
