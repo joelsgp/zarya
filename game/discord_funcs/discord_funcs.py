@@ -8,12 +8,16 @@ import random
 
 DISCORD_MESSAGE_LEN_LIMIT = 2000
 PREFIXES = (
-    '>', '> ',
-    '9v', '9v ',
+    ">",
+    "> ",
+    "9v",
+    "9v ",
 )
 
 
-async def discord_stutter(text, channel, delay=lambda: random.randint(1, 3)/100, skip=False):
+async def discord_stutter(
+    text, channel, delay=lambda: random.randint(1, 3) / 100, skip=False
+):
     """Send a message to a discord channel, with gradual print effect.
 
     Args:
@@ -28,7 +32,7 @@ async def discord_stutter(text, channel, delay=lambda: random.randint(1, 3)/100,
     # recurse to send the message in parts if it's over the message length limits
     if len(text) > DISCORD_MESSAGE_LEN_LIMIT:
         part_len = DISCORD_MESSAGE_LEN_LIMIT
-        parts = [text[i:i + part_len] for i in range(0, len(text), part_len)]
+        parts = [text[i : i + part_len] for i in range(0, len(text), part_len)]
         for part in parts:
             await discord_stutter(part, channel, delay, skip)
         return
@@ -40,11 +44,11 @@ async def discord_stutter(text, channel, delay=lambda: random.randint(1, 3)/100,
             part_len = len(text) // 5
         else:
             part_len = 100
-        parts = [text[i:i+part_len] for i in range(0, len(text), part_len)]
+        parts = [text[i : i + part_len] for i in range(0, len(text), part_len)]
 
         message = await channel.send(parts[0])
-        for i in range(2, len(parts)+1):
-            await message.edit(content=''.join(parts[:i]))
+        for i in range(2, len(parts) + 1):
+            await message.edit(content="".join(parts[:i]))
             time.sleep(delay())
 
 
@@ -67,7 +71,7 @@ def input_from_message(message, req_channel_name, prefixes=None):
             if message.content.startswith(prefix):
                 return message.content.removeprefix(prefix).strip()
 
-    return ''
+    return ""
 
 
 async def discord_input(discord_client, req_channel_name, prefixes=None):
@@ -82,7 +86,7 @@ async def discord_input(discord_client, req_channel_name, prefixes=None):
         String content from a valid message, with the prefix removed.
     """
     while True:
-        new_message = await discord_client.wait_for('message')
+        new_message = await discord_client.wait_for("message")
         check = input_from_message(new_message, req_channel_name, prefixes)
         if check:
             return check
