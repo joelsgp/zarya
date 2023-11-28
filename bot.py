@@ -42,7 +42,9 @@ def game_instance_running_check(ctx):
 
 help_command = discord.ext.commands.DefaultHelpCommand(no_category="Commands (prefixes - '>', '9v')")
 help_command.add_check(game_instance_running_check)
-client = discord.ext.commands.bot.Bot(command_prefix=PREFIXES, help_command=help_command)
+intents = discord.Intents.default()
+intents.message_content = True
+client = discord.ext.commands.bot.Bot(command_prefix=PREFIXES, help_command=help_command, intents=intents)
 
 client.game_instances = {}
 
