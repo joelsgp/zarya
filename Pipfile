@@ -5,7 +5,7 @@ name = "pypi"
 
 [packages]
 aiohttp = "*"
-"discord.py[speed]" = "*"
+"discord.py" = {extras = ["speed"], version = "*"}
 
 [dev-packages]
 

@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "26f0e3554a7ed673f6db89011a1b1ffee09c99d7aa77fb8bda3d31ed73e202b9"
+            "sha256": "f6122e6e96b962f30f594644beb7446c61eb176902bd25645fead06789e7e1bd"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -271,8 +271,7 @@
         },
         "discord.py": {
             "extras": [
-                "speed",
-                "speedup"
+                "speed"
             ],
             "hashes": [
                 "sha256:4560f70f2eddba7e83370ecebd237ac09fbb4980dc66507482b0c0e5b8f76b9c",
